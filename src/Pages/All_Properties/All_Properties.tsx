@@ -2,6 +2,7 @@ import React from "react";
 import Layout from "../../component/Layout/Layout";
 import Property_Card from "../../component/Property_Card/Property_Card";
 import FilterSearch from "../../component/FilterSearch/FilterSearch";
+import { Link } from "react-router-dom";
 
 const All_Properties = () => {
   return (
@@ -260,12 +261,11 @@ const All_Properties = () => {
           </div>
           <div className="mt-5 flex items-center justify-between gap-5">
             <div className="flex items-center gap-2">
-              <a
-                href="./index.html"
+              <Link to="/"
                 className="text-sm md:text-base h-max px-3 py-2 rounded-lg text-white bg-emerald transform duration-300 ease-in-out"
               >
                 <i className="fa-solid fa-less-than"></i>
-              </a>
+              </Link>
               <h1 className="text-sm font-semibold text-gray-600">
                 300+ Properties
               </h1>

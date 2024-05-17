@@ -1,6 +1,7 @@
 import React from "react";
 import Layout from "../../component/Layout/Layout";
 import FilterSearch from "../../component/FilterSearch/FilterSearch";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
@@ -34,11 +35,11 @@ const Home = () => {
         </h1>
         <div className="mt-5">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 2xl:gap-5">
-            <div className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></div>
-            <div className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></div>
-            <div className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></div>
-            <div className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></div>
-            <div className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></div>
+            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
+            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
+            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
+            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
+            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
           </div>
         </div>
       </div>
@@ -80,21 +81,21 @@ const Home = () => {
           </div>
 
           <div className="flex items-end">
-            <button className="text-sm md:text-base h-max px-3 py-2 rounded-md border border-emerald text-emerald hover:text-white hover:bg-emerald transform duration-300 ease-in-out">
+            <Link to="/properties" className="text-sm md:text-base h-max px-3 py-2 rounded-md border border-emerald text-emerald hover:text-white hover:bg-emerald transform duration-300 ease-in-out">
               View All
-            </button>
+            </Link>
           </div>
         </div>
 
         <div className="mt-5 flex flex-col gap-2 md:gap-5">
           <div className="grid grid-cols-2 gap-2 md:gap-5">
-            <div className="h-48 md:h-72 bg-gray-200 rounded-xl"></div>
-            <div className="h-48 md:h-72 bg-gray-200 rounded-xl"></div>
+            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-5">
-            <div className="h-48 md:h-72 bg-gray-200 rounded-xl"></div>
-            <div className="h-48 md:h-72 bg-gray-200 rounded-xl"></div>
-            <div className="h-48 md:h-72 bg-gray-200 rounded-xl"></div>
+            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
           </div>
         </div>
       </div>
@@ -110,9 +111,9 @@ const Home = () => {
             </p>
           </div>
           <div className="flex items-end">
-            <button className="text-sm md:text-base h-max px-3 py-2 rounded-md border border-emerald text-emerald hover:text-white hover:bg-emerald transform duration-300 ease-in-out">
+            <Link to="/properties" className="text-sm md:text-base h-max px-3 py-2 rounded-md border border-emerald text-emerald hover:text-white hover:bg-emerald transform duration-300 ease-in-out">
               View All
-            </button>
+            </Link>
           </div>
         </div>
         <div className="mt-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-5">
