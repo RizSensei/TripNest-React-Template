@@ -7,7 +7,7 @@ const Home = () => {
     <Layout>
       <div className="relative text-white mt-2 rounded-xl h-[60vh] flex flex-col items-center justify-center">
         <img
-          src="./public/images/img1.jpg"
+          src="./images/img1.jpg"
           alt=""
           className="h-full w-full object-cover rounded-xl"
         />
@@ -46,7 +46,7 @@ const Home = () => {
       <div className="mt-10">
         <div className="relative h-[60vh] w-full rounded-2xl overflow-hidden text-white">
           <img
-            src="./public/images/img2.jpg"
+            src="./images/img2.jpg"
             alt=""
             className="h-full w-full object-cover rounded-xl"
           />
