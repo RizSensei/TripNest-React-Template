@@ -2,6 +2,7 @@ import React from "react";
 import Layout from "../../component/Layout/Layout";
 import FilterSearch from "../../component/FilterSearch/FilterSearch";
 import { Link } from "react-router-dom";
+import Newsletter from "../../component/Newsletter/Newsletter";
 
 const Home = () => {
   return (
@@ -35,11 +36,15 @@ const Home = () => {
         </h1>
         <div className="mt-5">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 2xl:gap-5">
-            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
-            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
-            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
-            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
-            <Link to="/properties" className="h-[250px] 2xl:h-[375px] rounded-xl bg-gray-200"></Link>
+            {
+              ["Hotels","Apartments","Lodges","Resorts","Cottages"].map((property) => 
+              <Link to="/properties" className="relative h-[250px] 2xl:h-[375px] rounded-xl bg-shade overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50"></div>
+                <div className="w-full absolute bottom-5 text-white font-medium text-center">{property}</div>
+              </Link>
+              )
+            }
+            
           </div>
         </div>
       </div>
@@ -89,13 +94,13 @@ const Home = () => {
 
         <div className="mt-5 flex flex-col gap-2 md:gap-5">
           <div className="grid grid-cols-2 gap-2 md:gap-5">
-            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
-            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-5">
-            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
-            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
-            <Link to="/properties" className="h-48 md:h-72 bg-gray-200 rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
+            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
           </div>
         </div>
       </div>
@@ -118,35 +123,35 @@ const Home = () => {
         </div>
         <div className="mt-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-5">
           <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-gray-200 rounded-lg"></div>
+            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
             <div>
               <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
               <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-gray-200 rounded-lg"></div>
+            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
             <div>
               <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
               <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-gray-200 rounded-lg"></div>
+            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
             <div>
               <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
               <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-gray-200 rounded-lg"></div>
+            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
             <div>
               <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
               <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-gray-200 rounded-lg"></div>
+            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
             <div>
               <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
               <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
@@ -156,42 +161,7 @@ const Home = () => {
       </div>
 
       <div className="mt-10">
-        <div className="shadow-md shadow-gray-300 rounded-xl py-20">
-          <div className="flex flex-col items-center justify-center gap-10 px-5">
-            <h1 className="font-bold text-3xl text-emerald">
-              Stay in the know
-            </h1>
-            <p className="text-center text-sm font-medium">
-              Sign up to get marketing emails from TripNest.com, including
-              promotions, rewards, travel experiences, and information about
-              TripNest.com
-            </p>
-            <div className="flex flex-col md:flex-row gap-2">
-              <label className="input input-bordered flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  className="w-4 h-4 opacity-70"
-                >
-                  <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-                  <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
-                </svg>
-                <input type="text" className="grow" placeholder="Email" />
-              </label>
-              <button className="px-8 py-2 rounded-md text-white bg-emerald">
-                Subscribe
-              </button>
-            </div>
-            <p className="text-xs font-medium">
-              You can opt out anytime. See our 
-              <a href="#" className="text-emerald">
-                privacy statement
-              </a>
-              .
-            </p>
-          </div>
-        </div>
+        <Newsletter/>
       </div>
     </Layout>
   );

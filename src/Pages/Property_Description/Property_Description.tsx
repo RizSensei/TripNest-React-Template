@@ -1,19 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import Layout from "../../component/Layout/Layout";
 import Room_Card from "../../component/Room_Card/Room_Card";
 import FilterSearch from "../../component/FilterSearch/FilterSearch";
+import Amneties_Card from "../../component/Amneties/Amneties_Card";
+import Offer_Card from "../../component/Offers/Offer_Card";
+import { amneties } from "../../../public/mock/amneties";
 
 const Property_Description = () => {
+  let dataPerRow = 6;
+  const [next, setNext] = useState(dataPerRow);
+  const handleMoreAmneties = () => {
+    setNext(next + dataPerRow);
+  };
+
   return (
     <Layout>
       <div className="py-10 2xl:px-32 w-full">
         <div className="flex flex-col gap-5">
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 rounded-xl overflow-hidden">
-            <div className="h-60 md:h-full row-span-2 col-span-2 bg-gray-200"></div>
-            <div className="h-48 bg-gray-200"></div>
-            <div className="h-48 bg-gray-200"></div>
-            <div className="h-48 bg-gray-200"></div>
-            <div className="h-48 bg-gray-200"></div>
+            <div className="h-60 md:h-full row-span-2 col-span-2 bg-shade"></div>
+            <div className="h-48 bg-shade"></div>
+            <div className="h-48 bg-shade"></div>
+            <div className="h-48 bg-shade"></div>
+            <div className="relative h-48 bg-shade">
+              <div className="cursor-pointer absolute px-3 py-2 rounded-md backdrop-blur-md bg-white/30 hover:bg-white/90 bottom-2 right-2 duration-300 ease-in-out transform">
+                <div className="text-sm font-semibold flex gap-2 items-center justify-center w-full h-full">
+                  <i className="fa-solid fa-images"></i>
+                  <h1>10+</h1>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="flex w-full justify-between">
@@ -76,42 +92,34 @@ const Property_Description = () => {
 
               <div className="flex flex-col gap-3 mt-5">
                 <h1 className="text-lg font-semibold">Popular Amneties</h1>
-                <div className="max-w-sm w-full grid grid-cols-2 gap-2">
-                  <span className="text-sm flex items-center gap-2">
-                    <i className="fa-solid fa-paw text-emerald"></i>
-                    <h1>Pet friendly</h1>
-                  </span>
-                  <span className="text-sm flex items-center gap-2">
-                    <i className="fa-solid fa-bowl-food text-emerald"></i>
-                    <h1>Breakfast available</h1>
-                  </span>
-                  <span className="text-sm flex items-center gap-2">
-                    <i className="fa-solid fa-square-parking text-emerald"></i>
-                    <h1>Parking available</h1>
-                  </span>
-                  <span className="text-sm flex items-center gap-2">
-                    <i className="fa-solid fa-snowflake text-emerald"></i>
-                    <h1>Air conditioning</h1>
-                  </span>
-                  <span className="text-sm flex items-center gap-2">
-                    <i className="fa-solid fa-person-swimming text-emerald"></i>
-                    <h1>Swimming Pool</h1>
-                  </span>
-                  <span className="text-sm flex items-center gap-2">
-                    <i className="fa-solid fa-computer text-emerald"></i>
-                    <h1>24/7 front desk</h1>
-                  </span>
+                <div className="max-w-sm lg:max-w-2xl w-full grid grid-cols-2 lg:grid-cols-3 gap-2">
+                  {amneties?.slice(0, next).map((amnety, index) => (
+                    <Amneties_Card
+                      key={index}
+                      label={amnety.label}
+                      icon={amnety.icon}
+                    />
+                  ))}
                 </div>
-                <a href="#" className="underline text-sm text-blue-500">
-                  See all property amenities
-                </a>
+
+                <div
+                  className={`w-full flex justify-start ${
+                    next >= amneties.length || amneties.length === 0
+                      ? "hidden"
+                      : " "
+                  }`}
+                >
+                  <button
+                    onClick={() => handleMoreAmneties()}
+                    className="underline text-sm text-blue-500"
+                  >
+                    See all property amenities
+                  </button>
+                </div>
               </div>
             </div>
             <div className="col-span-1 w-full px-0 md:pl-10">
-              <a
-                href="#"
-                className="card w-full shadow-md rounded-md overflow-hidden"
-              >
+              <button className="card w-full shadow-md rounded-md overflow-hidden">
                 <figure>
                   <img
                     src="https://cdn.ttgtmedia.com/rms/onlineimages/screenshot_1_google_maps_on_desktop_f_mobile.jpg"
@@ -119,18 +127,11 @@ const Property_Description = () => {
                     className="w-full"
                   />
                 </figure>
-              </a>
+              </button>
             </div>
           </div>
 
-          <div className="bg-emerald text-white text-3xl w-full py-10 flex flex-col items-center justify-center rounded-md shadow shadow-gray-200">
-            <p className="font-dynapuff">
-              <a href="./signin.html" className="underline">
-                Sign in
-              </a>{" "}
-              to get 10% Off /-
-            </p>
-          </div>
+          <Offer_Card />
 
           <div id="reserve-a-room" className="mt-5">
             <h1 className="flex text-xl font-bold">Choose your room</h1>

@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       colors: {
         'emerald': '#059669',
+        'shade':'#d1d5db'
       },
     },
   },

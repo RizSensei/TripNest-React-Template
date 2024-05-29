@@ -30,7 +30,7 @@ const M_Saved_Trips = () => {
           </div>
         </div>
         <hr className="w-full my-5" />
-        <div className="w-full py-2">
+        <div className="w-full py-2 px-20 2xl:px-0">
           <div className="flex gap-2">
             <button
               className="font-medium px-3 py-2 rounded-md bg-emerald text-white"
