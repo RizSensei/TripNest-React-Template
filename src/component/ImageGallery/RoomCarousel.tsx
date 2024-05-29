@@ -11,6 +11,8 @@ import 'swiper/css/thumbs';
 // import required modules
 import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
 
+import '../../../public/style/reserve-room-modal-style.css'
+
 const RoomCarousel = () => {
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
   return (

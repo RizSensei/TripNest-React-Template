@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import MapModal from "../Modal/MapModal";
 
-const Property_Card = () => {
+const Property_Card = ({property}) => {
   const [isMapOpen, setIsMapOpen] = useState(false);
 
   const toggleMapModal = () => {
@@ -24,8 +24,8 @@ const Property_Card = () => {
           </div>
         </Link>
         <div className="flex flex-col gap-2 px-2 font-medium">
-          <h1 className="text-xl font-semibold">Radisson Hotel Kathmandu</h1>
-          <h1 className="underline text-xs text-emerald">Kathmandu</h1>
+          <h1 className="text-xl font-semibold">{property?.name}</h1>
+          <h1 className="underline text-xs text-emerald">{property?.location}</h1>
           <p className="text-xs">
             Lorem ipsum dolor sit, amet consectetur adipisicing elit.
             Perspiciatis quas nam impedit dicta culpa nobis quas nam impedit

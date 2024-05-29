@@ -1,244 +1,293 @@
-const hotels = [
+const properties = 
+[
     {
+        "id": 1,
         "name": "Hotel Annapurna",
+        "type": "hotel",
         "location": "Kathmandu",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 150,
+        "price_per_night": 1500,
         "contact": "+977-1-4221711",
         "email": "info@hotelannapurna.com.np",
         "description": "Hotel Annapurna is a luxury hotel in Kathmandu, offering top-notch services and amenities."
     },
     {
+        "id": 2,
         "name": "Shangri-La Hotel",
+        "type": "hotel",
         "location": "Kathmandu",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 200,
+        "price_per_night": 2000,
         "contact": "+977-1-4412999",
         "email": "reservations.slm@shangri-la.com",
         "description": "Shangri-La Hotel Kathmandu offers a blend of modern luxury and traditional charm in the heart of Kathmandu."
     },
     {
-        "name": "Hotel Yak & Yeti",
+        "id": 3,
+        "name": "Yak & Yeti Lodge",
+        "type": "lodge",
         "location": "Nagarkot",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 180,
+        "price_per_night": 1800,
         "contact": "+977-1-4248999",
         "email": "reservation@yakandyeti.com",
-        "description": "Hotel Yak & Yeti is a luxury hotel in Kathmandu, offering a unique blend of modern amenities and traditional Nepali hospitality."
+        "description": "Yak & Yeti Lodge is a luxury lodge in Nagarkot, offering a unique blend of modern amenities and traditional Nepali hospitality."
     },
     {
+        "id": 4,
         "name": "Radisson Hotel Kathmandu",
+        "type": "hotel",
         "location": "Kathmandu",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 160,
+        "price_per_night": 1600,
         "contact": "+977-1-4411818",
         "email": "reservations.kathmandu@radisson.com",
         "description": "Radisson Hotel Kathmandu offers a luxurious stay with modern amenities and stunning views of the Himalayas."
     },
     {
-        "name": "Hotel Everest",
+        "id": 5,
+        "name": "Everest Resort",
+        "type": "resort",
         "location": "Kathmandu",
         "stars": 4,
         "amenities": ["restaurant", "bar"],
-        "price_per_night": 100,
+        "price_per_night": 1000,
         "contact": "+977-1-4223777",
         "email": "info@hoteleverest.com",
-        "description": "Hotel Everest is a comfortable hotel in Kathmandu, offering great amenities and services."
+        "description": "Everest Resort is a comfortable resort in Kathmandu, offering great amenities and services."
     },
     {
-        "name": "Hotel Himalaya",
+        "id": 6,
+        "name": "Himalaya Cottage",
+        "type": "cottage",
         "location": "Nagarkot",
         "stars": 4,
         "amenities": ["restaurant", "pool"],
-        "price_per_night": 120,
+        "price_per_night": 1200,
         "contact": "+977-1-4273999",
         "email": "info@hotelhimalaya.com.np",
-        "description": "Hotel Himalaya is a peaceful retreat in Kathmandu, offering stunning views of the mountains and excellent hospitality."
+        "description": "Himalaya Cottage is a peaceful retreat in Nagarkot, offering stunning views of the mountains and excellent hospitality."
     },
     {
-        "name": "Hotel Vaishali",
+        "id": 7,
+        "name": "Vaishali Apartments",
+        "type": "apartment",
         "location": "Kathmandu",
         "stars": 4,
         "amenities": ["restaurant", "bar"],
-        "price_per_night": 90,
+        "price_per_night": 9000,
         "contact": "+977-1-4224636",
         "email": "info@hotelvaishali.com",
-        "description": "Hotel Vaishali is a vibrant hotel in Kathmandu, offering comfortable rooms and great dining options."
+        "description": "Vaishali Apartments is a vibrant place in Kathmandu, offering comfortable rooms and great dining options."
     },
     {
-        "name": "Hotel Manaslu",
+        "id": 8,
+        "name": "Manaslu Lodge",
+        "type": "lodge",
         "location": "Lumbini",
         "stars": 4,
         "amenities": ["restaurant", "bar"],
-        "price_per_night": 95,
+        "price_per_night": 9500,
         "contact": "+977-1-4410888",
         "email": "info@hotelmanaslu.com.np",
-        "description": "Hotel Manaslu is a classic hotel in Kathmandu, offering a blend of tradition and modernity."
+        "description": "Manaslu Lodge is a classic lodge in Lumbini, offering a blend of tradition and modernity."
     },
     {
-        "name": "Hotel Tibet International",
+        "id": 9,
+        "name": "Tibet International Apartments",
+        "type": "apartment",
         "location": "Kathmandu",
         "stars": 4,
         "amenities": ["restaurant", "bar"],
-        "price_per_night": 110,
+        "price_per_night": 1100,
         "contact": "+977-1-4257500",
         "email": "info@hoteltibetintl.com",
-        "description": "Hotel Tibet International is a charming hotel in Kathmandu, offering a peaceful stay and excellent service."
+        "description": "Tibet International Apartments is a charming place in Kathmandu, offering a peaceful stay and excellent service."
     },
     {
-        "name": "Hyatt Regency Kathmandu",
+        "id": 10,
+        "name": "Hyatt Regency Resort",
+        "type": "resort",
         "location": "Kathmandu",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 220,
+        "price_per_night": 2200,
         "contact": "+977-1-5171234",
         "email": "kathmandu.regency@hyatt.com",
-        "description": "Hyatt Regency Kathmandu is a luxury hotel offering a tranquil escape with modern amenities and exceptional service."
+        "description": "Hyatt Regency Resort is a luxury resort offering a tranquil escape with modern amenities and exceptional service."
     },
     {
-        "name": "Hotel Shambala",
+        "id": 11,
+        "name": "Shambala Lodge",
+        "type": "lodge",
         "location": "Chitwan",
         "stars": 4,
         "amenities": ["restaurant", "bar"],
-        "price_per_night": 85,
+        "price_per_night": 8500,
         "contact": "+977-1-4410522",
         "email": "info@hotelshambala.com",
-        "description": "Hotel Shambala is a boutique hotel in Kathmandu, offering a peaceful retreat in the heart of the city."
+        "description": "Shambala Lodge is a boutique lodge in Chitwan, offering a peaceful retreat in the heart of the city."
     },
     {
-        "name": "The Dwarika's Hotel",
+        "id": 12,
+        "name": "The Dwarika's Resort",
+        "type": "resort",
         "location": "Kathmandu",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 250,
+        "price_per_night": 2500,
         "contact": "+977-1-4470770",
         "email": "info@dwarikas.com",
-        "description": "The Dwarika's Hotel is a heritage hotel in Kathmandu, offering an authentic Nepali experience with luxurious accommodations."
+        "description": "The Dwarika's Resort is a heritage resort in Kathmandu, offering an authentic Nepali experience with luxurious accommodations."
     },
     {
-        "name": "Gokarna Forest Resort",
+        "id": 13,
+        "name": "Gokarna Forest Lodge",
+        "type": "lodge",
         "location": "Dhulikhel",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 180,
+        "price_per_night": 1800,
         "contact": "+977-1-4451212",
         "email": "info@gokarna.com",
-        "description": "Gokarna Forest Resort is a luxury resort in Kathmandu, nestled within the serene Gokarna Forest."
+        "description": "Gokarna Forest Lodge is a luxury lodge in Dhulikhel, nestled within the serene Gokarna Forest."
     },
     {
-        "name": "Hotel Barahi",
+        "id": 14,
+        "name": "Barahi Resort",
+        "type": "resort",
         "location": "Pokhara",
         "stars": 4,
         "amenities": ["restaurant", "pool"],
-        "price_per_night": 80,
+        "price_per_night": 8000,
         "contact": "+977-61-462222",
         "email": "info@hotelbarahi.com",
-        "description": "Hotel Barahi is a lakeside retreat in Pokhara, offering stunning views of Phewa Lake and the Annapurna range."
+        "description": "Barahi Resort is a lakeside retreat in Pokhara, offering stunning views of Phewa Lake and the Annapurna range."
     },
     {
-        "name": "Temple Tree Resort & Spa",
+        "id": 15,
+        "name": "Temple Tree Cottages",
+        "type": "cottage",
         "location": "Pokhara",
         "stars": 4,
         "amenities": ["restaurant", "pool"],
-        "price_per_night": 95,
+        "price_per_night": 9500,
         "contact": "+977-61-465819",
         "email": "info@templetreenepal.com",
-        "description": "Temple Tree Resort & Spa is a peaceful retreat in Pokhara, offering a blend of traditional architecture and modern amenities."
+        "description": "Temple Tree Cottages is a peaceful retreat in Pokhara, offering a blend of traditional architecture and modern amenities."
     },
     {
+        "id": 16,
         "name": "Shangri-La Village Resort",
+        "type": "resort",
         "location": "Dhulikhel",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 210,
+        "price_per_night": 2100,
         "contact": "+977-61-462222",
         "email": "reservations.slpr@shangri-la.com",
-        "description": "Shangri-La Village Resort is a luxurious getaway in Pokhara, offering breathtaking views of the Himalayas and serene surroundings."
+        "description": "Shangri-La Village Resort is a luxurious getaway in Dhulikhel, offering breathtaking views of the Himalayas and serene surroundings."
     },
     {
+        "id": 17,
         "name": "Fishtail Lodge",
+        "type": "lodge",
         "location": "Pokhara",
         "stars": 4,
         "amenities": ["restaurant", "pool"],
-        "price_per_night": 110,
+        "price_per_night": 1100,
         "contact": "+977-61-465046",
         "email": "fishtail@wlink.com.np",
         "description": "Fishtail Lodge is a tranquil retreat in Pokhara, offering stunning views of the Machhapuchhre mountain and a peaceful atmosphere."
     },
     {
+        "id": 18,
         "name": "The Fulbari Resort & Spa",
+        "type": "resort",
         "location": "Bhairahawa",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 230,
+        "price_per_night": 2300,
         "contact": "+977-61-465102",
         "email": "info@fulbari.com",
-        "description": "The Fulbari Resort & Spa is a luxury resort in Pokhara, offering unparalleled views of the Himalayas and luxurious accommodations."
+        "description": "The Fulbari Resort & Spa is a luxury resort in Bhairahawa, offering unparalleled views of the Himalayas and luxurious accommodations."
     },
     {
+        "id": 19,
         "name": "Hotel Fewa Dream",
+        "type": "hotel",
         "location": "Pokhara",
         "stars": 3,
         "amenities": ["restaurant"],
-        "price_per_night": 50,
+        "price_per_night": 5000,
         "contact": "+977-61-465489",
         "email": "hotelfewadream@gmail.com",
         "description": "Hotel Fewa Dream is a budget-friendly hotel in Pokhara, offering comfortable accommodation and warm hospitality."
     },
     {
-        "name": "Hotel Lake Star",
+        "id": 20,
+        "name": "Lake Star Apartments",
+        "type": "apartment",
         "location": "Pokhara",
         "stars": 3,
         "amenities": ["restaurant"],
-        "price_per_night": 45,
+        "price_per_night": 4500,
         "contact": "+977-61-464200",
         "email": "hotellakestar@gmail.com",
-        "description": "Hotel Lake Star is a budget hotel in Pokhara, offering a convenient location and comfortable rooms."
+        "description": "Lake Star Apartments is a budget place in Pokhara, offering a convenient location and comfortable rooms."
     },
     {
-        "name": "Hotel Landmark",
+        "id": 21,
+        "name": "Landmark Lodge",
+        "type": "lodge",
         "location": "Nagarkot",
         "stars": 3,
         "amenities": ["restaurant"],
-        "price_per_night": 55,
+        "price_per_night": 5500,
         "contact": "+977-61-464924",
         "email": "hotellandmarkpokhara@gmail.com",
-        "description": "Hotel Landmark is a budget hotel in Pokhara, offering comfortable accommodation and a convenient location."
+        "description": "Landmark Lodge is a budget lodge in Nagarkot, offering comfortable accommodation and a convenient location."
     },
     {
+        "id": 22,
         "name": "Tiger Mountain Pokhara Lodge",
+        "type": "lodge",
         "location": "Pokhara",
         "stars": 4,
         "amenities": ["restaurant", "pool"],
-        "price_per_night": 120,
+        "price_per_night": 1200,
         "contact": "+977-61-466648",
         "email": "tiger@mos.com.np",
         "description": "Tiger Mountain Pokhara Lodge is a peaceful retreat in Pokhara, offering stunning views of the Annapurna range and warm hospitality."
     },
     {
+        "id": 23,
         "name": "Tiger Palace Resort",
+        "type": "resort",
         "location": "Bhairahawa",
         "stars": 5,
         "amenities": ["spa", "restaurant", "pool"],
-        "price_per_night": 200,
+        "price_per_night": 2000,
         "contact": "+977-71-521166",
         "email": "info@tigerpalace.com",
         "description": "Tiger Palace Resort is a luxury resort in Bhairahawa, offering a blend of modern amenities and traditional Nepali architecture."
     },
     {
-        "name": "Hotel Crystal Palace",
+        "id": 24,
+        "name": "Crystal Palace Apartments",
+        "type": "apartment",
         "location": "Bhairahawa",
         "stars": 3,
         "amenities": ["restaurant"],
-        "price_per_night": 40,
+        "price_per_night": 4000,
         "contact": "+977-71-521120",
         "email": "info@hotelcrystalpalace.com",
-        "description": "Hotel Crystal Palace is a budget-friendly hotel in Bhairahawa, offering comfortable accommodation and great value for money."
+        "description": "Crystal Palace Apartments is a budget-friendly place in Bhairahawa, offering comfortable accommodation and great value for money."
     }
-]
+];
 
-export default hotels;
+export default properties;

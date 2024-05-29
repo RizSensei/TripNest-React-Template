@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import Layout from "../../component/Layout/Layout";
-import Room_Card from "../../component/Room_Card/Room_Card";
-import FilterSearch from "../../component/FilterSearch/FilterSearch";
-import Amneties_Card from "../../component/Amneties/Amneties_Card";
-import Offer_Card from "../../component/Offers/Offer_Card";
 import { amneties } from "../../../public/mock/amneties";
+import Amneties_Card from "../../component/Amneties/Amneties_Card";
+import FilterSearch from "../../component/FilterSearch/FilterSearch";
+import Layout from "../../component/Layout/Layout";
+import Offer_Card from "../../component/Offers/Offer_Card";
+import ReviewSection from "../../component/Reviews/ReviewSection";
+import Room_Card from "../../component/Room_Card/Room_Card";
 
 const Property_Description = () => {
   let dataPerRow = 6;
@@ -90,6 +91,7 @@ const Property_Description = () => {
                 </div>
               </div>
 
+              {/* Popular amneties */}
               <div className="flex flex-col gap-3 mt-5">
                 <h1 className="text-lg font-semibold">Popular Amneties</h1>
                 <div className="max-w-sm lg:max-w-2xl w-full grid grid-cols-2 lg:grid-cols-3 gap-2">
@@ -133,22 +135,41 @@ const Property_Description = () => {
 
           <Offer_Card />
 
+          {/* room sections */}
           <div id="reserve-a-room" className="mt-5">
             <h1 className="flex text-xl font-bold">Choose your room</h1>
 
             <div className="rounded-md bg-white shadow-md shadow-gray-300">
               <FilterSearch />
             </div>
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
               <Room_Card />
               <Room_Card />
               <Room_Card />
               <Room_Card />
             </div>
           </div>
+
+         <ReviewSection/>
+
+          {/* contact information */}
+          <div className="flex flex-col gap-5 mt-5">
+            <h1 className="flex text-xl font-bold">Contact Information</h1>
+            <div className="flex gap-5 text-sm font-medium">
+              <div className="flex gap-2 items-center justify-center border px-5 py-3 rounded-xl">
+                <i className="fa-solid fa-phone text-emerald"></i>
+                <p>+977-1-4221711</p>
+              </div>
+              <div className="flex gap-2 items-center justify-center border px-5 py-3 rounded-xl">
+                <i className="fa-solid fa-envelope text-emerald"></i>
+                <p>info@hotelannapurna.com.np</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
+    
   );
 };
 

@@ -3,6 +3,7 @@ import Layout from "../../component/Layout/Layout";
 import Property_Card from "../../component/Property_Card/Property_Card";
 import FilterSearch from "../../component/FilterSearch/FilterSearch";
 import { Link } from "react-router-dom";
+import properties from "../../../public/mock/properties"
 
 const All_Properties = () => {
   return (
@@ -279,9 +280,12 @@ const All_Properties = () => {
             </select>
           </div>
           <div className="mt-5 grid grid-cols-1 2xl:grid-cols-2 gap-5">
-            <Property_Card />
-            <Property_Card />
-            <Property_Card />
+            {
+              properties && properties.map((distinct_property) => (
+                <Property_Card property={distinct_property} />
+              ))
+            }
+            
           </div>
         </div>
       </div>

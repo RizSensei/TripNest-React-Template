@@ -1,11 +1,12 @@
-import React from 'react'
-import Layout from '../../component/Layout/Layout'
-import Property_Card from '../../component/Property_Card/Property_Card'
+import React from "react";
+import Layout from "../../component/Layout/Layout";
+import Property_Card from "../../component/Property_Card/Property_Card";
+import { saved_properties } from "../../../public/mock/saved_properties";
 
 const M_Saved_Trips = () => {
   return (
     <Layout>
-        <div className="mt-5 pb-10 pt-5 2xl:px-32 w-full">
+      <div className="mt-5 pb-10 pt-5 2xl:px-32 w-full">
         <div className="w-full gap-5 sm:gap-0 flex justify-between items-center">
           <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-semibold">My Saved Trips</h1>
@@ -32,35 +33,28 @@ const M_Saved_Trips = () => {
         <hr className="w-full my-5" />
         <div className="w-full py-2 px-20 2xl:px-0">
           <div className="flex gap-2">
-            <button
-              className="font-medium px-3 py-2 rounded-md bg-emerald text-white"
-            >
+            <button className="font-medium px-3 py-2 rounded-md bg-emerald text-white">
               All
             </button>
-            <button
-              className="font-medium px-3 py-2 rounded-md border border-emerald text-emerald"
-            >
+            <button className="font-medium px-3 py-2 rounded-md border border-emerald text-emerald">
               Hotels
             </button>
-            <button
-              className="font-medium px-3 py-2 rounded-md border border-emerald text-emerald"
-            >
+            <button className="font-medium px-3 py-2 rounded-md border border-emerald text-emerald">
               Apartments
             </button>
-            <button
-              className="font-medium px-3 py-2 rounded-md border border-emerald text-emerald"
-            >
+            <button className="font-medium px-3 py-2 rounded-md border border-emerald text-emerald">
               Lodges
             </button>
           </div>
           <div className="w-full mt-5 grid grid-cols-1 2xl:grid-cols-2 gap-5">
-            <Property_Card/>
-            <Property_Card/>
+            {saved_properties?.map((distinct_property) => (
+              <Property_Card property={distinct_property}/>
+            ))}
           </div>
         </div>
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default M_Saved_Trips
+export default M_Saved_Trips;

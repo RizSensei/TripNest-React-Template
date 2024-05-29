@@ -4,7 +4,7 @@ import RoomCarousel from "../ImageGallery/RoomCarousel";
 
 const ReserveRoomModal = ({ toggleReserveRoomModal }) => {
   return (
-    <Modal_Layout>
+    <Modal_Layout position='centre'>
       <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-2">
         <div className="h-full">
           <RoomCarousel />

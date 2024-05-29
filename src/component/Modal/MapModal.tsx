@@ -12,7 +12,7 @@ const MapModal = ({ toggleMapModal }) => {
     minZoom: 8,
   };
   return (
-    <Modal_Layout>
+    <Modal_Layout position='centre'>
       <div className="h-full w-full overflow-hidden">
         <MapContainer {...mapOptions} style={{ height: "500px" }} className="-z-0">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
