@@ -4,11 +4,16 @@ import Footer from './Footer'
 
 const Layout = ({children}) => {
   return (
-    <div className='font-poppins px-10 md:px-20 lg:px-32 h-full w-full'>
-      <Navbar/>
-      {children}
-      <Footer/>
-    </div>
+<div className="font-poppins px-10 md:px-20 lg:px-32 min-h-screen flex flex-col">
+  <Navbar />
+
+  <main className="flex-1">
+    {children}
+  </main>
+
+  <Footer />
+</div>
+
   )
 }
 

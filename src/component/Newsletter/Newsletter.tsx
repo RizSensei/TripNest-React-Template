@@ -2,7 +2,7 @@ import React from 'react'
 
 const Newsletter = () => {
   return (
-    <div className="shadow-md shadow-gray-300 rounded-xl py-20">
+    <div className="rounded-xl py-20">
           <div className="flex flex-col items-center justify-center gap-10 px-5">
             <h1 className="font-bold text-3xl text-emerald">
               Stay in the know
@@ -30,7 +30,7 @@ const Newsletter = () => {
               </button>
             </div>
             <p className="text-xs font-medium">
-              You can opt out anytime. See our 
+              You can opt out anytime. See our &nbsp;
               <a href="#" className="text-emerald">
                 privacy statement
               </a>

@@ -4,164 +4,149 @@ import FilterSearch from "../../component/FilterSearch/FilterSearch";
 import { Link } from "react-router-dom";
 import Newsletter from "../../component/Newsletter/Newsletter";
 
+const sunriseRegions = [
+  { label: "Everest Window", subtitle: "Namche Ridge Lodge", accent: "from-orange-300 to-orange-600" },
+  { label: "Annapurna Balcony", subtitle: "Pokhara Lakefront Resort", accent: "from-amber-300 to-yellow-600" },
+  { label: "Mustang Cliffhouse", subtitle: "Upper Mustang Eco-Lodge", accent: "from-rose-300 to-orange-600" },
+  { label: "Chitwan Canopy", subtitle: "Rapti River Lodge", accent: "from-yellow-200 to-amber-500" },
+  { label: "Langtang Dawn", subtitle: "Nagarkot Hilltop Boutique", accent: "from-red-200 to-orange-500" },
+];
+
 const Home = () => {
   return (
     <Layout>
-      <div className="relative text-white mt-2 rounded-xl h-[60vh] flex flex-col items-center justify-center">
+      <div className="relative mt-2 flex h-[65vh] flex-col items-center justify-center overflow-hidden rounded-3xl text-white shadow-lg shadow-orange-100">
         <img
           src="./images/img1.jpg"
-          alt=""
-          className="h-full w-full object-cover rounded-xl"
+          alt="Sunrise mountain view"
+          className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 h-full w-full bg-black bg-opacity-50 rounded-xl">
-          <div className="h-full w-full flex flex-col items-center justify-center text-center">
-            <h1 className="font-dynapuff text-4xl md:text-6xl">
-              Find your next stay
-            </h1>
-            <p className="mt-2 text-sm md:text-base">
-              Search deals on hotels, resort, and much more...
-            </p>
-          </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-orange-950/60" />
+        <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center px-6 text-center">
+          <p className="mb-4 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium uppercase tracking-[0.25em] text-orange-100 backdrop-blur-sm">
+            Nepal, seen at sunrise
+          </p>
+          <h1 className="font-dynapuff text-4xl md:text-6xl lg:text-7xl">
+            The 6:00 AM View
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm text-orange-50 md:text-lg">
+            Wake up to Himalayan light, cliffside balconies, lake reflections, and mountain mornings you actually want to remember.
+          </p>
         </div>
-        <div className="text-black absolute -bottom-16 w-[calc(100%-2rem)] md:w-[calc(100%-5rem)] lg:w-[calc(100%-10rem)] rounded-md bg-white shadow-md shadow-gray-300">
+        {/* <div className="absolute -bottom-16 w-[calc(100%-2rem)] rounded-2xl bg-white text-black shadow-xl shadow-orange-100 md:w-[calc(100%-5rem)] lg:w-[calc(100%-10rem)]">
           <FilterSearch />
-        </div>
+        </div> */}
       </div>
 
-      <div className="h-28"></div>
+      <div className="h-28" />
 
       <div className="h-full w-full">
-        <h1 className="text-2xl md:text-3xl text-emerald font-bold">
-          Discover your new favourite stay
-        </h1>
-        <div className="mt-5">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 2xl:gap-5">
-            {
-              ["Hotels","Apartments","Lodges","Resorts","Cottages"].map((property) => 
-              <Link to="/properties" className="relative h-[250px] 2xl:h-[375px] rounded-xl bg-shade overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50"></div>
-                <div className="w-full absolute bottom-5 text-white font-medium text-center">{property}</div>
-              </Link>
-              )
-            }
-            
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-10">
-        <div className="relative h-[60vh] w-full rounded-2xl overflow-hidden text-white">
-          <img
-            src="./images/img2.jpg"
-            alt=""
-            className="h-full w-full object-cover rounded-xl"
-          />
-          <div className="absolute inset-0 h-full w-full bg-black bg-opacity-50 rounded-xl">
-            <div className="h-full w-full flex flex-col gap-4 justify-center pl-10 md:pl-20">
-              <h1 className="text-3xl md:text-5xl">
-                Early Summer Sale:
-                <br />
-                Save 25% or more
-              </h1>
-              <p className="text-sm">
-                Members save 25% or more on select hotels. Book by May 26.
-              </p>
-              <button className="w-max px-3 py-2 bg-emerald rounded-xl text-sm md:text-base">
-                Unlock Deals
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-10">
-        <div className="flex justify-between">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl md:text-3xl text-emerald font-bold">
-              Trending destinations
+        <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-500">Morning deck</p>
+            <h1 className="mt-2 text-2xl font-bold text-stone-800 md:text-3xl">
+              Discover the view before the day begins
             </h1>
-            <p className="text-sm text-gray-800 font-semibold">
-              Most popular choices for travelers from Nepal
+          </div>
+          <Link
+            to="/properties"
+            className="w-max rounded-xl border border-orange-300 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 transition hover:bg-orange-500 hover:text-white"
+          >
+            Explore stays
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5 2xl:gap-5">
+          {sunriseRegions.map((property) => (
+            <Link
+              key={property.label}
+              to="/properties"
+              className={`group relative h-[220px] overflow-hidden rounded-2xl bg-gradient-to-br ${property.accent}`} 
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                <div className="text-lg font-semibold">{property.label}</div>
+                <div className="text-xs text-orange-100">{property.subtitle}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-10 rounded-[2rem] bg-gradient-to-r from-orange-50 via-amber-50 to-orange-100 p-5 md:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-500">Story-led discovery</p>
+            <h1 className="mt-2 text-3xl font-bold text-stone-800 md:text-5xl">
+              Your room, framed by the morning sky.
+            </h1>
+          </div>
+
+          <button className="w-max rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-orange-200 transition hover:bg-orange-600">
+            Reserve this view
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-bold text-stone-800 md:text-3xl">
+              Nepal’s most iconic sunrise stays
+            </h1>
+            <p className="text-sm font-semibold text-stone-600">
+              Handpicked for misty ridges, golden-hour lakes, and extraordinary morning views.
             </p>
           </div>
 
           <div className="flex items-end">
-            <Link to="/properties" className="text-sm md:text-base h-max px-3 py-2 rounded-md border border-emerald text-emerald hover:text-white hover:bg-emerald transform duration-300 ease-in-out">
-              View All
+            <Link
+              to="/properties"
+              className="h-max rounded-md border border-orange-300 bg-orange-50 px-3 py-2 text-sm text-orange-700 transition hover:bg-orange-500 hover:text-white md:text-base"
+            >
+              View all views
             </Link>
           </div>
         </div>
 
-        <div className="mt-5 flex flex-col gap-2 md:gap-5">
-          <div className="grid grid-cols-2 gap-2 md:gap-5">
-            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
-            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-5">
-            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
-            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
-            <Link to="/properties" className="h-48 md:h-72 bg-shade rounded-xl"></Link>
-          </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <Link to="/properties" className="relative h-64 overflow-hidden rounded-3xl bg-gradient-to-br from-amber-200 via-orange-300 to-yellow-500 md:h-80">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <div className="text-sm uppercase tracking-[0.25em] text-orange-100">Everest</div>
+              <h2 className="mt-2 text-2xl font-semibold">Namche Ridge Lodge</h2>
+            </div>
+          </Link>
+          <Link to="/properties" className="relative h-64 overflow-hidden rounded-3xl bg-gradient-to-br from-sky-200 via-orange-200 to-yellow-400 md:h-80">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <div className="text-sm uppercase tracking-[0.25em] text-orange-100">Annapurna</div>
+              <h2 className="mt-2 text-2xl font-semibold">Pokhara Lakefront Resort</h2>
+            </div>
+          </Link>
         </div>
       </div>
 
       <div className="mt-10">
-        <div className="flex justify-between">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl md:text-3xl text-emerald font-bold">
-              Explore Nepal
-            </h1>
-            <p className="text-sm text-gray-800 font-semibold">
-              These popular destinations have a lot to offer
-            </p>
-          </div>
-          <div className="flex items-end">
-            <Link to="/properties" className="text-sm md:text-base h-max px-3 py-2 rounded-md border border-emerald text-emerald hover:text-white hover:bg-emerald transform duration-300 ease-in-out">
-              View All
-            </Link>
-          </div>
-        </div>
-        <div className="mt-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-5">
-          <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
-            <div>
-              <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
-              <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            { title: "Elevation-first stays", text: "Discover properties ranked by view quality, sunrise exposure, and mountain proximity." },
+            { title: "Authentic local hosting", text: "Stay with families and operators who bring culture, warmth, and place-based storytelling." },
+            { title: "Book the moment", text: "Move from dreaming to reservation in a seamless, visual-first booking journey." },
+          ].map((item) => (
+            <div key={item.title} className="rounded-2xl border border-orange-100 bg-white p-6 shadow-sm shadow-orange-100">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-lg text-orange-600">
+                <i className="fa-solid fa-mountain-sun" />
+              </div>
+              <h2 className="text-xl font-semibold text-stone-800">{item.title}</h2>
+              <p className="mt-3 text-sm leading-6 text-stone-600">{item.text}</p>
             </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
-            <div>
-              <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
-              <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
-            <div>
-              <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
-              <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
-            <div>
-              <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
-              <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="h-48 md:h-56 bg-shade rounded-lg"></div>
-            <div>
-              <h1 className="font-semibold text-sm md:text-base">Kathmandu</h1>
-              <h1 className="text-xs md:text-sm font-medium">10 Properties</h1>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
       <div className="mt-10">
-        <Newsletter/>
+        <Newsletter />
       </div>
     </Layout>
   );
