@@ -16,6 +16,7 @@ import About from "./Pages/About/About";
 import Contact from "./Pages/Contact/Contact";
 import FAQ from "./Pages/FAQ/FAQ";
 import NotFound from "./Pages/NotFound/NotFound";
+import RequireAuth from "./component/Auth/RequireAuth";
 
 function App() {
   return (
@@ -26,15 +27,31 @@ function App() {
           <Route path="/login" element={<Signin />} />
           <Route path="/register" element={<Register />} />
           <Route path="/properties" element={<All_Properties />} />
-          <Route path="/property-description/:slug" element={<Property_Description />} />
-          <Route path="/property-description" element={<Property_Description />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/booking-confirmed" element={<Booking_Confirmation />} />
-          <Route path="/my-saved-trips" element={<My_Saved_Trips />} />
-          <Route path="/user-profile" element={<User_Profile />} />
-          <Route path="/trip-history" element={<Trip_History />} />
-          <Route path="/wishlist" element={<Wishlist />} />
+          <Route
+            path="/property-description/:slug"
+            element={<Property_Description />}
+          />
+          <Route
+            path="/property-description"
+            element={<Property_Description />}
+          />
+          <Route element={<RequireAuth />}>
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/payment/:bookingId" element={<Payment />} />
+            <Route
+              path="/booking-confirmed"
+              element={<Booking_Confirmation />}
+            />
+            <Route
+              path="/booking-confirmed/:bookingId"
+              element={<Booking_Confirmation />}
+            />
+            <Route path="/my-saved-trips" element={<My_Saved_Trips />} />
+            <Route path="/user-profile" element={<User_Profile />} />
+            <Route path="/trip-history" element={<Trip_History />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+          </Route>
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />

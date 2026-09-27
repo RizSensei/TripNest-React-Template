@@ -1,11 +1,27 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useCurrentUser, useLogout } from "../../api/queries";
+import { useAuth } from "../../context/AuthContext";
 import Profile_Dropdown_Link from "../Route_Link/Profile_Dropdown_Link";
 import TripNestLogo from "../Logo/TripNestLogo";
 
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [isProfileDropdown, setIsProfileDropdown] = useState(false);
+  const { token } = useAuth();
+  const currentUser = useCurrentUser();
+  const logout = useLogout();
+  const navigate = useNavigate();
+  const user = currentUser.data;
+  const userName = user?.name || user?.email || "Your account";
+
+  const signOut = async () => {
+    try {
+      await logout.mutateAsync();
+      navigate("/");
+    } catch {
+      // Keep the session active when the server rejects logout.
+    }
+  };
 
   return (
     <nav className="relative flex w-full items-center justify-between border border-x-0 border-t-0 border-orange-100 py-4">
@@ -26,21 +42,19 @@ const Navbar = () => {
           <Link to="/faq" className="rounded-full px-3 py-2 text-stone-700 transition hover:bg-orange-50 hover:text-orange-600">FAQ</Link>
           <Link to="/contact" className="rounded-full px-3 py-2 text-stone-700 transition hover:bg-orange-50 hover:text-orange-600">Contact</Link>
         </div>
-        {/* <div className="flex overflow-hidden rounded-full border border-orange-200 bg-orange-50 p-1 text-xs shadow-sm shadow-orange-100">
-          <button className="rounded-full bg-orange-500 px-3 py-1.5 text-white shadow-sm">NPR</button>
-          <button className="rounded-full px-3 py-1.5 text-stone-600 transition hover:text-orange-600">USD</button>
-        </div> */}
-        {isAuthenticated ? (
+        {token ? (
           <div className="relative">
             <button
-              onClick={() => setIsProfileDropdown(!isProfileDropdown)}
+              onClick={() => setIsProfileDropdown((open) => !open)}
               id="profile-dropdown"
               aria-expanded={isProfileDropdown}
               aria-haspopup="menu"
               className="flex items-center gap-2 rounded-full border border-orange-200 bg-white py-1.5 pl-1.5 pr-3 text-stone-700 shadow-sm shadow-orange-100 transition hover:border-orange-400 hover:bg-orange-50"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-800 text-xs font-bold text-white">R</span>
-              <span className="hidden sm:inline">Rijan</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-800 text-xs font-bold text-white">
+                {userName[0]?.toUpperCase() || "U"}
+              </span>
+              <span className="hidden max-w-36 truncate sm:inline">{userName}</span>
               <i className={`fa-solid fa-chevron-down text-[10px] text-orange-500 transition-transform ${isProfileDropdown ? "rotate-180" : ""}`} />
             </button>
             {isProfileDropdown && (
@@ -50,24 +64,30 @@ const Navbar = () => {
                 className="absolute right-0 top-12 z-20 w-64 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-xl shadow-stone-200/50"
               >
                 <div className="border-b border-orange-100 bg-orange-50 px-5 py-4">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-600">Good morning</p>
-                  <p className="mt-1 text-lg font-semibold text-stone-800">Rijan&apos;s TripNest</p>
-                  <p className="mt-1 text-xs font-normal text-stone-500">Chasing the first light</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-600">Your TripNest account</p>
+                  <p className="mt-1 truncate text-lg font-semibold text-stone-800">{userName}</p>
                 </div>
+                {currentUser.error && <p role="alert" className="px-5 pt-3 text-xs text-red-600">{currentUser.error.message}</p>}
                 <div className="flex w-full flex-col py-2 text-stone-600">
                   <Profile_Dropdown_Link icon="user" label="My Profile" route="user-profile" />
                   <Profile_Dropdown_Link icon="heart" label="Wishlist" route="wishlist" />
                   <Profile_Dropdown_Link icon="history" label="Trip History" route="trip-history" />
-                  <Profile_Dropdown_Link icon="right-from-bracket" label="Sign Out" route="login" />
+                  <button
+                    type="button"
+                    onClick={signOut}
+                    disabled={logout.isPending}
+                    className="flex items-center gap-3 px-5 py-3 text-left text-sm hover:bg-orange-50"
+                  >
+                    <i className="fa-solid fa-right-from-bracket w-4" />
+                    {logout.isPending ? "Signing out…" : "Sign out"}
+                  </button>
+                  {logout.error && <p role="alert" className="px-5 pb-2 text-xs text-red-600">{logout.error.message}</p>}
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <Link
-            to="/login"
-            className="rounded-full bg-orange-500 px-4 py-2 text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600"
-          >
+          <Link to="/login" className="rounded-full bg-orange-500 px-4 py-2 text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600">
             Sign in
           </Link>
         )}

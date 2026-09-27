@@ -1,289 +1,511 @@
-import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { properties } from "../../../public/mock/properties";
+import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
+import {
+  Link,
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import {
+  useCreateQuote,
+  useCreateReview,
+  useProperty,
+  useReviews,
+  useWishlist,
+  useWishlistMutation,
+  useBookings,
+} from "../../api/queries";
+import { useAuth } from "../../context/AuthContext";
 import Layout from "../../component/Layout/Layout";
+import type {
+  AddOn,
+  BookingSummary,
+  PropertyReview,
+  PropertySummary,
+  RoomType,
+} from "../../api/types";
 
-const viewOptions: Array<{
-  key: keyof (typeof properties)[number]["timesOfDay"];
-  label: string;
-  icon: string;
-}> = [
-  { key: "sunrise", label: "6:00 AM", icon: "fa-sun" },
-  { key: "midday", label: "12:00 PM", icon: "fa-cloud-sun" },
-  { key: "goldenHour", label: "5:30 PM", icon: "fa-mountain-sun" },
-];
-
-const roomOptions = [
-  { value: "panorama-suite", label: "Panorama suite", detail: "1 king bed · 2 guests" },
-  { value: "view-twin-room", label: "View twin room", detail: "2 twin beds · 2 guests" },
-  { value: "family-lodge-room", label: "Family lodge room", detail: "2 beds · 4 guests" },
-];
+const dateAfter = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+};
 
 const Property_Description = () => {
   const { slug } = useParams();
-  const selectedProperty =
-    properties.find((property) => property.slug === slug) || properties[0];
-  const [activeViewKey, setActiveViewKey] =
-    useState<keyof (typeof properties)[number]["timesOfDay"]>("sunrise");
-  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
-  const [isSaved, setIsSaved] = useState(false);
-  const [checkIn, setCheckIn] = useState("2026-10-12");
-  const [checkOut, setCheckOut] = useState("2026-10-15");
-  const [guestCount, setGuestCount] = useState("2");
-  const [roomCount, setRoomCount] = useState("1");
-  const [selectedRoom, setSelectedRoom] = useState(roomOptions[0].value);
-  const activeView = selectedProperty.timesOfDay[activeViewKey];
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { token } = useAuth();
+  const propertyQuery = useProperty(slug);
+  const property = propertyQuery.data as PropertySummary | undefined;
+  const reviewsQuery = useReviews(property?.id, {
+    page: 1,
+    pageSize: 10,
+    sort: "recent",
+  });
+  const wishlistQuery = useWishlist();
+  const wishlistMutation = useWishlistMutation();
+  const quoteMutation = useCreateQuote();
+  const reviewMutation = useCreateReview();
+  const bookingsQuery = useBookings();
+  const [checkIn, setCheckIn] = useState(dateAfter(1));
+  const [checkOut, setCheckOut] = useState(dateAfter(4));
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [rooms, setRooms] = useState(1);
+  const [roomTypeId, setRoomTypeId] = useState("");
+  const [addOnIds, setAddOnIds] = useState<string[]>([]);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewBody, setReviewBody] = useState("");
+  const [bookingId, setBookingId] = useState("");
+  const [activeView, setActiveView] = useState("sunrise");
+  const roomTypes: RoomType[] = property?.roomTypes || [];
+  const chosenRoomId = roomTypeId || roomTypes[0]?.id || "";
+  const selectedRoom = roomTypes.find((room) => room.id === chosenRoomId);
+  const viewKeys = useMemo(
+    () => (property?.timesOfDay ? Object.keys(property.timesOfDay) : []),
+    [property],
+  );
+  const selectedView =
+    property?.timesOfDay?.[activeView] || property?.timesOfDay?.[viewKeys[0]];
+  const saved = ((wishlistQuery.data?.items || []) as PropertySummary[]).some(
+    (item) => item.id === property?.id,
+  );
+  const reviewEligibleBookings = (
+    (bookingsQuery.data?.items || []) as BookingSummary[]
+  ).filter(
+    (booking) =>
+      booking.property?.id === property?.id &&
+      booking.status !== "CANCELLED" &&
+      new Date(booking.checkOut).getTime() < Date.now(),
+  );
 
-  const addOns = [
-    {
-      name: "Sunrise Walled-City Walk",
-      detail:
-        "A guided stroll through 14th-century Lo Manthang before the streets wake up.",
-      icon: "fa-person-walking",
-    },
-    {
-      name: "Ancient Sky Cave Tour",
-      detail:
-        "A private exploration of the cliffside caves visible from your window.",
-      icon: "fa-dungeon",
-    },
-  ];
-
-  const toggleAddOn = (name: string) => {
-    setSelectedAddOns((currentAddOns) =>
-      currentAddOns.includes(name)
-        ? currentAddOns.filter((addOn) => addOn !== name)
-        : [...currentAddOns, name],
-    );
+  const toggleWishlist = async () => {
+    if (!property) return;
+    if (!token) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    try {
+      await wishlistMutation.mutateAsync({
+        propertyId: property.id,
+        saved: !saved,
+      });
+    } catch {
+      // The mutation error is shown beside the wishlist action.
+    }
   };
+
+  const requestQuote = async () => {
+    if (!property) return;
+    if (!token) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    try {
+      const quote = await quoteMutation.mutateAsync({
+        propertyId: property.id,
+        checkIn,
+        checkOut,
+        adults,
+        children,
+        rooms,
+        ...(chosenRoomId ? { roomTypeId: chosenRoomId } : {}),
+        addOnIds,
+      });
+      navigate("/checkout", {
+        state: {
+          quote,
+          property,
+          checkIn,
+          checkOut,
+          adults,
+          children,
+          rooms,
+          roomTypeId: chosenRoomId,
+          roomName: selectedRoom?.name || "Room",
+        },
+      });
+    } catch {
+      // Quote errors, including unavailable dates, are displayed below.
+    }
+  };
+
+  const submitReview = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!property) return;
+    try {
+      await reviewMutation.mutateAsync({
+        propertyId: property.id,
+        rating: reviewRating,
+        title: reviewTitle,
+        body: reviewBody,
+        bookingId,
+      });
+      setReviewTitle("");
+      setReviewBody("");
+      setBookingId("");
+    } catch {
+      // The mutation error is rendered in the review form.
+    }
+  };
+
+  if (!slug) return <Navigate to="/properties" replace />;
+  if (propertyQuery.isPending) {
+    return (
+      <Layout>
+        <p className="py-12 text-center">Loading property…</p>
+      </Layout>
+    );
+  }
+  if (propertyQuery.error || !property) {
+    return (
+      <Layout>
+        <div className="py-12 text-center">
+          <p role="alert" className="text-red-700">
+            {propertyQuery.error?.message || "Property not found."}
+          </p>
+          <Link
+            to="/properties"
+            className="mt-4 inline-block text-orange-600 underline"
+          >
+            Browse properties
+          </Link>
+        </div>
+      </Layout>
+    );
+  }
+
+  const photo =
+    selectedView?.imageUrl || property.image || property.images?.[0]?.url;
 
   return (
     <Layout>
-      <main className="w-full pb-36 pt-8 2xl:px-20">
+      <main className="w-full pb-20 pt-8 2xl:px-20">
         <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-600">
-              {selectedProperty.vibeCategory}
+              {property.vibeCategory}
             </p>
             <h1 className="mt-2 text-3xl font-bold text-stone-900 md:text-5xl">
-              {selectedProperty.title}
+              {property.title}
             </h1>
             <p className="mt-2 text-sm text-stone-600">
-              {selectedProperty.propertyName} · {selectedProperty.location.town}
-              , {selectedProperty.location.region}
+              {property.propertyName} · {property.location?.town},{" "}
+              {property.location?.region}
             </p>
           </div>
           <div className="flex items-center gap-3 text-sm text-stone-600">
-            <span className="flex items-center gap-1 text-amber-500">
-              <i className="fa-solid fa-star" />
-              <strong className="text-stone-800">
-                {selectedProperty.rating.toFixed(2)}
-              </strong>
+            <span className="text-amber-500">
+              <i className="fa-solid fa-star" />{" "}
+              <strong className="text-stone-800">{property.rating}</strong>
             </span>
-            <span>{selectedProperty.reviewCount} view notes</span>
+            <span>{property.reviewCount} reviews</span>
             <button
               type="button"
-              onClick={() => setIsSaved(!isSaved)}
-              aria-label={
-                isSaved ? "Remove from saved views" : "Save this view"
-              }
-              className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${isSaved ? "border-orange-500 bg-orange-500 text-white" : "border-orange-200 text-orange-600 hover:bg-orange-50"}`}
+              onClick={toggleWishlist}
+              disabled={wishlistMutation.isPending}
+              aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
+              className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${saved ? "border-orange-500 bg-orange-500 text-white" : "border-orange-200 text-orange-600 hover:bg-orange-50"}`}
             >
-              <i className={`fa-${isSaved ? "solid" : "regular"} fa-heart`} />
+              <i className={`fa-${saved ? "solid" : "regular"} fa-heart`} />
             </button>
           </div>
         </div>
+        {wishlistMutation.error && (
+          <p role="alert" className="mb-3 text-sm text-red-600">
+            {wishlistMutation.error.message}
+          </p>
+        )}
 
         <section className="relative overflow-hidden rounded-[1.75rem] bg-stone-900 shadow-2xl shadow-orange-200/60">
           <div className="relative h-[28rem] md:h-[38rem]">
-            <img
-              src={activeView.imageUrl}
-              alt={`${selectedProperty.title} at ${activeView.timeLabel}`}
-              className="h-full w-full object-cover transition duration-500"
-            />
+            {photo && (
+              <img
+                src={photo}
+                alt={`${property.title} ${selectedView?.timeLabel || ""}`}
+                className="h-full w-full object-cover"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-stone-950/20" />
-
-            <div className="absolute left-4 right-4 top-4 flex flex-col gap-3 md:left-8 md:right-8 md:flex-row md:items-start md:justify-between">
-              <div className="rounded-2xl border border-white/30 bg-stone-950/35 p-4 text-white backdrop-blur-md">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-orange-200">
-                  Window perspective
-                </p>
-                <p className="mt-1 text-lg font-semibold">
-                  {activeView.timeLabel}
-                </p>
-                <p className="mt-1 max-w-xs text-xs leading-5 text-white/80">
-                  {activeView.description}
-                </p>
-              </div>
-              <div className="flex rounded-full border border-white/30 bg-stone-950/35 p-1 backdrop-blur-md">
-                {viewOptions.map((view) => (
+            {viewKeys.length > 0 && (
+              <div className="absolute right-4 top-4 flex rounded-full border border-white/30 bg-stone-950/35 p-1 backdrop-blur-md">
+                {viewKeys.map((key: string) => (
                   <button
-                    key={view.key}
+                    key={key}
                     type="button"
-                    onClick={() => setActiveViewKey(view.key)}
-                    className={`flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold transition md:px-4 ${activeViewKey === view.key ? "bg-orange-500 text-white" : "text-white/80 hover:bg-white/15"}`}
+                    onClick={() => setActiveView(key)}
+                    className={`rounded-full px-4 py-2 text-xs font-semibold capitalize ${activeView === key ? "bg-orange-500 text-white" : "text-white/80 hover:bg-white/15"}`}
                   >
-                    <i className={`fa-solid ${view.icon}`} />
-                    <span>{view.label}</span>
+                    {key.replace(/([A-Z])/g, " $1")}
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className="absolute bottom-5 left-4 right-4 grid gap-2 md:bottom-8 md:left-8 md:right-8 md:grid-cols-4">
-              {[
-                [
-                  "Elevation",
-                  selectedProperty.elevationFormatted,
-                  "fa-arrow-up",
-                ],
-                ["Key peaks", selectedProperty.peakVisible, "fa-mountain"],
-                ["Orientation", selectedProperty.orientation, "fa-compass"],
-                ["Atmosphere", selectedProperty.skyClarity, "fa-wind"],
-              ].map(([label, value, icon]) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-white/20 bg-stone-950/45 p-3 text-white backdrop-blur-md"
-                >
-                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-orange-200">
-                    <i className={`fa-solid ${icon}`} />
-                    {label}
-                  </div>
-                  <p className="mt-1 text-sm font-semibold leading-5">
-                    {value}
-                  </p>
-                </div>
-              ))}
-            </div>
+            )}
+            {selectedView && (
+              <div className="absolute bottom-5 left-5 max-w-md rounded-2xl border border-white/30 bg-stone-950/45 p-4 text-white backdrop-blur-md">
+                <p className="text-lg font-semibold">
+                  {selectedView.timeLabel}
+                </p>
+                <p className="mt-1 text-sm text-white/80">
+                  {selectedView.description}
+                </p>
+              </div>
+            )}
           </div>
         </section>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-8">
-            <section>
-              <p className="max-w-3xl text-lg leading-8 text-stone-700">
-                {activeView.description} Stay inside the frame of Upper
-                Mustang&apos;s red-clay canyons, where ancient cave dwellings
-                and distant snowcaps turn the first light into an experience.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-orange-800">
-                <span className="rounded-full bg-orange-100 px-3 py-2">
-                  High-Desert Plateau
-                </span>
-                <span className="rounded-full bg-orange-100 px-3 py-2">
-                  Direct morning sun
-                </span>
-                <span className="rounded-full bg-orange-100 px-3 py-2">
-                  Local host welcome
-                </span>
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-orange-100 bg-orange-50 p-6 md:p-8">
-              <div className="flex flex-col gap-5 md:flex-row md:items-start">
-                <img
-                  src={selectedProperty.host.avatarUrl}
-                  alt={selectedProperty.host.name}
-                  className="h-20 w-20 rounded-2xl object-cover"
-                />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">
-                    Meet your host
+            <section className="grid gap-3 sm:grid-cols-2">
+              {[
+                [
+                  "Elevation",
+                  property.elevationMeters
+                    ? `${property.elevationMeters.toLocaleString()} m`
+                    : "—",
+                ],
+                ["Visible peaks", property.peakVisible || "—"],
+                ["Orientation", property.orientation || "—"],
+                ["Atmosphere", property.skyClarity || "—"],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-xl border border-orange-100 bg-orange-50 p-4"
+                >
+                  <p className="text-xs uppercase tracking-widest text-orange-700">
+                    {label}
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-stone-900">
-                    {selectedProperty.host.name}
-                  </h2>
-                  <p className="text-sm text-stone-600">
-                    {selectedProperty.host.role}
-                  </p>
-                  <p className="mt-4 text-lg italic leading-7 text-stone-700">
-                    &quot;{selectedProperty.host.quote}&quot;
-                  </p>
-                  <p className="mt-4 flex items-center gap-2 text-sm font-semibold text-orange-700">
-                    <i className="fa-solid fa-mug-hot" /> A glass of hot local
-                    Mustang apple cider on arrival
-                  </p>
+                  <p className="mt-1 font-semibold text-stone-900">{value}</p>
                 </div>
-              </div>
+              ))}
             </section>
-
-            <section>
-              <div className="mb-4 flex items-end justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">
-                    Room & window experience
-                  </p>
-                  <h2 className="mt-1 text-2xl font-bold text-stone-900">
-                    Comfort at 3,840 m
-                  </h2>
+            {property.host && (
+              <section className="rounded-2xl border border-orange-100 bg-orange-50 p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-700">
+                  Your host
+                </p>
+                <div className="mt-4 flex items-center gap-4">
+                  {property.host.avatarUrl ? (
+                    <img
+                      src={property.host.avatarUrl}
+                      alt={
+                        property.host.name
+                          ? `${property.host.name}, your host`
+                          : "Your host"
+                      }
+                      className="h-16 w-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      aria-hidden="true"
+                      className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-orange-200 text-xl font-semibold text-orange-800"
+                    >
+                      {property.host.name?.[0]?.toUpperCase() || "H"}
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="text-xl font-bold text-stone-900">
+                      {property.host.name || "Your host"}
+                    </h2>
+                    {property.host.role && (
+                      <p className="mt-1 text-sm text-stone-600">
+                        {property.host.role}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <i className="fa-solid fa-bed text-2xl text-orange-400" />
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {selectedProperty.roomHighlights.map((highlight) => (
-                  <div
-                    key={highlight}
-                    className="flex gap-3 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm shadow-orange-100"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-600">
-                      <i className="fa-solid fa-check" />
-                    </span>
-                    <p className="text-sm font-medium leading-6 text-stone-700">
-                      {highlight}
+                {property.host.quote && (
+                  <blockquote className="mt-4 border-l-2 border-orange-300 pl-4 text-sm leading-6 text-stone-700">
+                    “{property.host.quote}”
+                  </blockquote>
+                )}
+              </section>
+            )}
+            {property.roomHighlights?.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-stone-900">
+                  Room highlights
+                </h2>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {property.roomHighlights.map((item: string) => (
+                    <li
+                      key={item}
+                      className="rounded-full bg-orange-100 px-3 py-2 text-sm text-orange-800"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {property.amenities?.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-stone-900">Amenities</h2>
+                <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {property.amenities.map((item: string) => (
+                    <li key={item} className="text-sm text-stone-700">
+                      <i className="fa-solid fa-check mr-2 text-emerald" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {(property.policies?.houseRules?.length ||
+              property.policies?.cancellation) && (
+              <section className="rounded-2xl border border-orange-100 bg-white p-6">
+                <h2 className="text-2xl font-bold text-stone-900">Policies</h2>
+                {property.policies.cancellation && (
+                  <div className="mt-4">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-orange-700">
+                      Cancellation
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-stone-700">
+                      {property.policies.cancellation}
                     </p>
                   </div>
-                ))}
-                <div className="flex gap-3 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm shadow-orange-100">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-600">
-                    <i className="fa-solid fa-mug-hot" />
-                  </span>
-                  <p className="text-sm font-medium leading-6 text-stone-700">
-                    Mustangi breakfast with salt-butter tea, buckwheat bread,
-                    and wild yak cheese delivered to bed.
-                  </p>
-                </div>
-              </div>
-            </section>
-
+                )}
+                {property.policies.houseRules &&
+                  property.policies.houseRules.length > 0 && (
+                    <div className="mt-5">
+                      <h3 className="text-sm font-semibold uppercase tracking-wider text-orange-700">
+                        House rules
+                      </h3>
+                      <ul className="mt-2 space-y-2">
+                        {property.policies.houseRules.map((rule: string) => (
+                          <li
+                            key={rule}
+                            className="flex gap-2 text-sm leading-6 text-stone-700"
+                          >
+                            <i
+                              className="fa-solid fa-check mt-1 text-emerald"
+                              aria-hidden="true"
+                            />
+                            <span>{rule}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+              </section>
+            )}
             <section>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">
-                Cultural & trail add-ons
-              </p>
-              <h2 className="mt-1 text-2xl font-bold text-stone-900">
-                Step beyond the window
+              <h2 className="text-2xl font-bold text-stone-900">
+                Guest reviews
               </h2>
-              <div className="mt-4 space-y-3">
-                {addOns.map((addOn) => {
-                  const isSelected = selectedAddOns.includes(addOn.name);
-                  return (
-                    <button
-                      key={addOn.name}
-                      type="button"
-                      onClick={() => toggleAddOn(addOn.name)}
-                      className={`flex w-full items-center justify-between gap-4 rounded-2xl border p-4 text-left transition ${isSelected ? "border-orange-500 bg-orange-50" : "border-stone-200 bg-white hover:border-orange-300"}`}
+              {reviewsQuery.isPending && (
+                <p className="mt-3 text-sm text-stone-500">Loading reviews…</p>
+              )}
+              {reviewsQuery.error && (
+                <p role="alert" className="mt-3 text-sm text-red-600">
+                  {reviewsQuery.error.message}
+                </p>
+              )}
+              <div className="mt-4 space-y-4">
+                {((reviewsQuery.data?.items || []) as PropertyReview[]).map(
+                  (review) => (
+                    <article
+                      key={review.id}
+                      className="rounded-xl border border-orange-100 p-4"
                     >
-                      <span className="flex items-start gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-orange-600">
-                          <i className={`fa-solid ${addOn.icon}`} />
+                      <div className="flex justify-between gap-4">
+                        <h3 className="font-semibold text-stone-900">
+                          {review.title}
+                        </h3>
+                        <span className="whitespace-nowrap text-amber-600">
+                          ★ {review.rating}/5
                         </span>
-                        <span>
-                          <strong className="block text-sm text-stone-900">
-                            {addOn.name}
-                          </strong>
-                          <span className="mt-1 block text-xs leading-5 text-stone-600">
-                            {addOn.detail}
-                          </span>
-                        </span>
-                      </span>
-                      <span
-                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${isSelected ? "border-orange-500 bg-orange-500 text-white" : "border-stone-300 text-transparent"}`}
-                      >
-                        <i className="fa-solid fa-check text-xs" />
-                      </span>
-                    </button>
-                  );
-                })}
+                      </div>
+                      <p className="mt-2 text-sm text-stone-700">
+                        {review.body}
+                      </p>
+                      <p className="mt-2 text-xs text-stone-500">
+                        {review.author} ·{" "}
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </p>
+                    </article>
+                  ),
+                )}
+                {!reviewsQuery.isPending &&
+                  !reviewsQuery.error &&
+                  reviewsQuery.data?.items?.length === 0 && (
+                    <p className="text-sm text-stone-500">No reviews yet.</p>
+                  )}
               </div>
+              {token && reviewEligibleBookings.length > 0 && (
+                <form
+                  onSubmit={submitReview}
+                  className="mt-5 space-y-3 rounded-xl bg-orange-50 p-4"
+                >
+                  <h3 className="font-semibold text-stone-900">
+                    Share a review
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <select
+                      value={bookingId}
+                      onChange={(event) => setBookingId(event.target.value)}
+                      required
+                      className="rounded-lg border p-2"
+                      aria-label="Select completed stay"
+                    >
+                      <option value="">Select a completed stay</option>
+                      {reviewEligibleBookings.map((booking) => (
+                        <option
+                          key={booking.bookingId}
+                          value={booking.bookingId}
+                        >
+                          {booking.bookingId}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={reviewRating}
+                      onChange={(event) =>
+                        setReviewRating(Number(event.target.value))
+                      }
+                      className="rounded-lg border p-2"
+                      aria-label="Rating"
+                    >
+                      {[5, 4, 3, 2, 1].map((rating) => (
+                        <option key={rating} value={rating}>
+                          {rating} stars
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    value={reviewTitle}
+                    onChange={(event) => setReviewTitle(event.target.value)}
+                    required
+                    maxLength={120}
+                    placeholder="Review title"
+                    className="w-full rounded-lg border p-2"
+                  />
+                  <textarea
+                    value={reviewBody}
+                    onChange={(event) => setReviewBody(event.target.value)}
+                    required
+                    rows={3}
+                    placeholder="Tell travelers about your stay"
+                    className="w-full rounded-lg border p-2"
+                  />
+                  {reviewMutation.error && (
+                    <p role="alert" className="text-sm text-red-600">
+                      {reviewMutation.error.message}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={reviewMutation.isPending}
+                    className="rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                  >
+                    {reviewMutation.isPending ? "Submitting…" : "Submit review"}
+                  </button>
+                </form>
+              )}
             </section>
           </div>
 
@@ -291,54 +513,21 @@ const Property_Description = () => {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">
               The stay at a glance
             </p>
-            <div className="mt-5 flex items-center gap-3 rounded-2xl bg-stone-900 p-4 text-white">
-              <i className="fa-solid fa-location-dot text-orange-300" />
-              <div>
-                <p className="text-sm font-semibold">
-                  {selectedProperty.location.town}
-                </p>
-                <p className="text-xs text-white/60">
-                  {selectedProperty.location.country} ·{" "}
-                  {selectedProperty.elevationFormatted}
-                </p>
-              </div>
-            </div>
-            <dl className="mt-5 space-y-4 text-sm">
-              <div className="flex justify-between gap-4">
-                <dt className="text-stone-500">Peak visibility</dt>
-                <dd className="text-right font-semibold text-stone-800">
-                  {selectedProperty.peakVisible}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-stone-500">Light direction</dt>
-                <dd className="text-right font-semibold text-stone-800">
-                  {selectedProperty.orientation}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-stone-500">View rating</dt>
-                <dd className="font-semibold text-stone-800">
-                  {selectedProperty.rating} / 5
-                </dd>
-              </div>
-            </dl>
-            <div className="mt-6 border-t border-orange-100 pt-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-stone-500">
-                From
+            <div className="mt-5 rounded-2xl bg-stone-900 p-4 text-white">
+              <p className="text-sm font-semibold">
+                {property.location?.town}, {property.location?.country}
               </p>
-              <p className="mt-1 text-3xl font-bold text-stone-900">
-                ${selectedProperty.pricePerNight}
-                <span className="text-sm font-medium text-stone-500">
-                  {" "}
-                  / night
-                </span>
-              </p>
-              <p className="mt-2 text-xs text-stone-500">
-                Includes the window experience, room highlights, and host
-                welcome.
+              <p className="mt-1 text-xs text-white/70">
+                {property.location?.region}
               </p>
             </div>
+            <p className="mt-5 text-3xl font-bold text-stone-900">
+              {property.currency} {property.pricePerNight}
+              <span className="text-sm font-medium text-stone-500">
+                {" "}
+                / night
+              </span>
+            </p>
             <div className="mt-5 space-y-4 border-t border-orange-100 pt-5">
               <div className="grid grid-cols-2 gap-3">
                 <label className="text-xs font-semibold text-stone-600">
@@ -346,9 +535,9 @@ const Property_Description = () => {
                   <input
                     type="date"
                     value={checkIn}
-                    min={new Date().toISOString().split("T")[0]}
+                    min={dateAfter(0)}
                     onChange={(event) => setCheckIn(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm font-semibold text-stone-800 focus:border-orange-500 focus:outline-none"
+                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm"
                   />
                 </label>
                 <label className="text-xs font-semibold text-stone-600">
@@ -358,65 +547,123 @@ const Property_Description = () => {
                     value={checkOut}
                     min={checkIn}
                     onChange={(event) => setCheckOut(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm font-semibold text-stone-800 focus:border-orange-500 focus:outline-none"
+                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm"
                   />
                 </label>
               </div>
               <label className="block text-xs font-semibold text-stone-600">
                 Room type
                 <select
-                  value={selectedRoom}
-                  onChange={(event) => setSelectedRoom(event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm font-semibold text-stone-800 focus:border-orange-500 focus:outline-none"
+                  value={chosenRoomId}
+                  onChange={(event) => setRoomTypeId(event.target.value)}
+                  required
+                  className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm"
                 >
-                  {roomOptions.map((room) => (
-                    <option key={room.value} value={room.value}>
-                      {room.label} · {room.detail}
+                  {roomTypes.map((room) => (
+                    <option key={room.id} value={room.id}>
+                      {room.name} · {property.currency} {room.pricePerNight}
+                      /night
                     </option>
                   ))}
                 </select>
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
+                <label className="text-xs font-semibold text-stone-600">
+                  Adults
+                  <input
+                    type="number"
+                    min="1"
+                    value={adults}
+                    onChange={(event) => setAdults(Number(event.target.value))}
+                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm"
+                  />
+                </label>
+                <label className="text-xs font-semibold text-stone-600">
+                  Children
+                  <input
+                    type="number"
+                    min="0"
+                    value={children}
+                    onChange={(event) =>
+                      setChildren(Number(event.target.value))
+                    }
+                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm"
+                  />
+                </label>
                 <label className="text-xs font-semibold text-stone-600">
                   Rooms
-                  <select
-                    value={roomCount}
-                    onChange={(event) => setRoomCount(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm font-semibold text-stone-800 focus:border-orange-500 focus:outline-none"
-                  >
-                    <option value="1">1 room</option>
-                    <option value="2">2 rooms</option>
-                    <option value="3">3 rooms</option>
-                  </select>
-                </label>
-                <label className="text-xs font-semibold text-stone-600">
-                  Guests
-                  <select
-                    value={guestCount}
-                    onChange={(event) => setGuestCount(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm font-semibold text-stone-800 focus:border-orange-500 focus:outline-none"
-                  >
-                    <option value="1">1 guest</option>
-                    <option value="2">2 guests</option>
-                    <option value="3">3 guests</option>
-                    <option value="4">4 guests</option>
-                    <option value="5">5 guests</option>
-                    <option value="6">6 guests</option>
-                    <option value="7">7 guests</option>
-                    <option value="8">8 guests</option>
-                    <option value="9">9 guests</option>
-                    <option value="10">10 guests</option>
-                  </select>
+                  <input
+                    type="number"
+                    min="1"
+                    value={rooms}
+                    onChange={(event) => setRooms(Number(event.target.value))}
+                    className="mt-1 w-full rounded-lg border border-orange-200 px-2 py-2 text-sm"
+                  />
                 </label>
               </div>
-              <Link
-                to="/checkout"
-                state={{ checkIn, checkOut, guestCount, roomCount, selectedRoom }}
-                className="flex items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600"
+              {property.addOns?.length > 0 && (
+                <fieldset className="space-y-2">
+                  <legend className="text-xs font-semibold text-stone-600">
+                    Optional add-ons
+                  </legend>
+                  {(property.addOns as AddOn[]).map((addOn) => (
+                    <label
+                      key={addOn.id}
+                      className="flex items-center justify-between gap-2 text-sm"
+                    >
+                      <span>
+                        <input
+                          type="checkbox"
+                          checked={addOnIds.includes(addOn.id)}
+                          onChange={(event) =>
+                            setAddOnIds((current) =>
+                              event.target.checked
+                                ? [...current, addOn.id]
+                                : current.filter((id) => id !== addOn.id),
+                            )
+                          }
+                          className="mr-2"
+                        />
+                        {addOn.name}
+                      </span>
+                      <span>
+                        {property.currency} {addOn.price}
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
+              {quoteMutation.error && (
+                <p role="alert" className="text-sm text-red-600">
+                  {quoteMutation.error.message}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={requestQuote}
+                disabled={
+                  quoteMutation.isPending ||
+                  !checkIn ||
+                  !checkOut ||
+                  checkOut <= checkIn ||
+                  adults < 1 ||
+                  rooms < 1
+                }
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600 disabled:opacity-60"
               >
-                Reserve This View <i className="fa-solid fa-arrow-right" />
-              </Link>
+                {quoteMutation.isPending
+                  ? "Checking availability…"
+                  : token
+                    ? "Check availability & reserve"
+                    : "Sign in to reserve"}
+                <i className="fa-solid fa-arrow-right" />
+              </button>
             </div>
+            {property.policies?.cancellation && (
+              <p className="mt-4 text-xs text-stone-500">
+                {property.policies.cancellation}
+              </p>
+            )}
           </aside>
         </div>
       </main>

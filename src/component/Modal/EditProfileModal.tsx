@@ -12,9 +12,11 @@ type EditProfileModalProps = {
   profile: ProfileDetails;
   onClose: () => void;
   onSave: (profile: ProfileDetails) => void;
+  isSaving?: boolean;
+  error?: string;
 };
 
-const EditProfileModal = ({ profile, onClose, onSave }: EditProfileModalProps) => {
+const EditProfileModal = ({ profile, onClose, onSave, isSaving = false, error }: EditProfileModalProps) => {
   const [draftProfile, setDraftProfile] = useState(profile);
 
   const updateField = (field: keyof ProfileDetails, value: string) => {
@@ -72,8 +74,7 @@ const EditProfileModal = ({ profile, onClose, onSave }: EditProfileModalProps) =
               <input
                 type="email"
                 value={draftProfile.email}
-                onChange={(event) => updateField("email", event.target.value)}
-                required
+                readOnly
                 className="mt-2 w-full rounded-xl border border-orange-200 px-4 py-3 font-normal text-stone-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
               />
             </label>
@@ -83,7 +84,6 @@ const EditProfileModal = ({ profile, onClose, onSave }: EditProfileModalProps) =
                 type="tel"
                 value={draftProfile.phone}
                 onChange={(event) => updateField("phone", event.target.value)}
-                required
                 className="mt-2 w-full rounded-xl border border-orange-200 px-4 py-3 font-normal text-stone-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
               />
             </label>
@@ -93,13 +93,13 @@ const EditProfileModal = ({ profile, onClose, onSave }: EditProfileModalProps) =
                 type="text"
                 value={draftProfile.favoriteHorizon}
                 onChange={(event) => updateField("favoriteHorizon", event.target.value)}
-                required
                 className="mt-2 w-full rounded-xl border border-orange-200 px-4 py-3 font-normal text-stone-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
               />
             </label>
           </div>
 
           <div className="flex justify-end gap-3 border-t border-orange-100 pt-5">
+            {error && <p role="alert" className="mr-auto self-center text-sm text-red-600">{error}</p>}
             <button
               type="button"
               onClick={onClose}
@@ -109,9 +109,10 @@ const EditProfileModal = ({ profile, onClose, onSave }: EditProfileModalProps) =
             </button>
             <button
               type="submit"
+              disabled={isSaving}
               className="rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600"
             >
-              Save changes
+              {isSaving ? "Saving…" : "Save changes"}
             </button>
           </div>
         </form>

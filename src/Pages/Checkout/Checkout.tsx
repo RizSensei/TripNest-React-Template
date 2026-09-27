@@ -1,36 +1,69 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useCreateBooking, useProfile } from "../../api/queries";
 import Layout from "../../component/Layout/Layout";
 
 const Checkout = () => {
   const location = useLocation();
-  const booking = location.state as
-    | {
-        checkIn?: string;
-        checkOut?: string;
-        guestCount?: string;
-        roomCount?: string;
-        selectedRoom?: string;
-      }
-    | undefined;
-  const roomLabels: Record<string, string> = {
-    "panorama-suite": "Panorama suite",
-    "view-twin-room": "View twin room",
-    "family-lodge-room": "Family lodge room",
+  const navigate = useNavigate();
+  const booking = location.state;
+  const profileQuery = useProfile();
+  const createBooking = useCreateBooking();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [guestNotes, setGuestNotes] = useState("");
+  const [preferences, setPreferences] = useState("");
+
+  useEffect(() => {
+    if (!booking?.quote?.quoteId) {
+      navigate("/properties", { replace: true });
+    }
+  }, [booking, navigate]);
+
+  useEffect(() => {
+    const profile = profileQuery.data;
+    if (!profile) return;
+    const [givenName = "", ...familyName] = (profile.name || "").split(" ");
+    setFirstName((current) => current || givenName);
+    setLastName((current) => current || familyName.join(" "));
+    setEmail((current) => current || profile.email || "");
+    setPhone((current) => current || profile.phone || "");
+  }, [profileQuery.data]);
+
+  if (!booking?.quote?.quoteId) return null;
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const result = await createBooking.mutateAsync({
+        quoteId: booking.quote.quoteId,
+        firstName,
+        lastName,
+        email,
+        phone,
+        paymentMethod: "card",
+        guestNotes,
+        preferences,
+      });
+      navigate(`/booking-confirmed/${encodeURIComponent(result.bookingId)}`, {
+        state: {
+          bookingId: result.bookingId,
+          booking: result,
+          property: booking.property,
+        },
+        replace: true,
+      });
+    } catch {
+      // The mutation error is displayed in the form.
+    }
   };
-  const formatDate = (date: string) =>
-    new Date(`${date}T00:00:00`).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  const checkIn = booking?.checkIn ? formatDate(booking.checkIn) : "12 Aug 2026";
-  const checkOut = booking?.checkOut ? formatDate(booking.checkOut) : "15 Aug 2026";
-  const guests = booking?.guestCount || "2";
-  const rooms = booking?.roomCount || "1";
-  const roomName = booking?.selectedRoom
-    ? roomLabels[booking.selectedRoom] || booking.selectedRoom
-    : "Deluxe King Room";
+
+  const quote = booking.quote;
+  const currency = quote.currency || booking.property?.currency || "";
+  const money = (amount: number) => `${currency} ${Number(amount).toFixed(2)}`;
 
   return (
     <Layout>
@@ -39,170 +72,195 @@ const Checkout = () => {
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald">
             Reserve the view
           </p>
-          <h1 className="mt-2 text-3xl font-bold text-stone-900">Wake up somewhere unforgettable</h1>
+          <h1 className="mt-2 text-3xl font-bold text-stone-900">
+            Confirm your stay
+          </h1>
         </div>
-
-        <div className="grid gap-8 lg:grid-cols-[1.4fr_0.8fr]">
+        <form
+          onSubmit={submit}
+          className="grid gap-8 lg:grid-cols-[1.4fr_0.8fr]"
+        >
           <div className="space-y-6">
             <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-stone-900">Who is catching the first light?</h2>
-                <span className="rounded-full bg-emerald/10 px-3 py-1 text-xs font-semibold text-emerald">
-                  {rooms} {rooms === "1" ? "room" : "rooms"} · {guests} {guests === "1" ? "guest" : "guests"}
-                </span>
-              </div>
-
+              <h2 className="mb-5 text-xl font-semibold text-stone-900">
+                Guest details
+              </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-700">
                   First name
                   <input
-                    type="text"
-                    defaultValue="Aarav"
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 focus:border-emerald focus:outline-none"
+                    value={firstName}
+                    onChange={(event) => setFirstName(event.target.value)}
+                    required
+                    autoComplete="given-name"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"
                   />
                 </label>
-
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-700">
                   Last name
                   <input
-                    type="text"
-                    defaultValue="Sharma"
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 focus:border-emerald focus:outline-none"
+                    value={lastName}
+                    onChange={(event) => setLastName(event.target.value)}
+                    required
+                    autoComplete="family-name"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"
                   />
                 </label>
-
-                <label className="block text-sm font-medium text-gray-700 md:col-span-2">
+                <label className="text-sm font-medium text-gray-700 md:col-span-2">
                   Email address
                   <input
                     type="email"
-                    defaultValue="aarav@example.com"
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 focus:border-emerald focus:outline-none"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                    autoComplete="email"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"
                   />
                 </label>
-
-                <label className="block text-sm font-medium text-gray-700 md:col-span-2">
+                <label className="text-sm font-medium text-gray-700 md:col-span-2">
                   Phone number
                   <input
                     type="tel"
-                    defaultValue="+977 9841 234567"
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 focus:border-emerald focus:outline-none"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    required
+                    autoComplete="tel"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"
                   />
                 </label>
               </div>
             </section>
-
             <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="mb-5 text-xl font-semibold text-stone-900">How would you like to reserve?</h2>
-
-              <div className="space-y-3">
-                {[
-                  "Credit / Debit Card",
-                  "Esewa / Mobile wallet",
-                  "Bank transfer",
-                  "Cash on arrival",
-                ].map((method, index) => (
-                  <label
-                    key={method}
-                    className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 ${
-                      index === 0 ? "border-emerald bg-emerald/5" : "border-gray-200"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="payment-method"
-                        defaultChecked={index === 0}
-                        className="h-4 w-4 accent-emerald"
-                      />
-                      <span className="font-medium text-gray-800">{method}</span>
-                    </div>
-                    <i className="fa-solid fa-shield-halved text-sm text-emerald"></i>
-                  </label>
-                ))}
-              </div>
+              <h2 className="mb-2 text-xl font-semibold text-stone-900">
+                Payment method
+              </h2>
+              <p className="rounded-xl border border-emerald bg-emerald/5 p-4 text-sm text-stone-700">
+                Card payment will be requested after your booking is created.
+                Payment processing is not yet available.
+              </p>
             </section>
-
             <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="mb-5 text-xl font-semibold text-stone-900">Make the room yours</h2>
-              <textarea
-                rows={4}
-                placeholder="Tell us about your preferences, such as room type, early check-in, or accessibility needs."
-                className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-900 focus:border-emerald focus:outline-none"
-              />
+              <h2 className="mb-5 text-xl font-semibold text-stone-900">
+                Make the room yours
+              </h2>
+              <label className="block text-sm font-medium text-gray-700">
+                Arrival notes
+                <textarea
+                  value={guestNotes}
+                  onChange={(event) => setGuestNotes(event.target.value)}
+                  rows={3}
+                  placeholder="For example, your expected arrival time."
+                  className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-2.5"
+                />
+              </label>
+              <label className="mt-4 block text-sm font-medium text-gray-700">
+                Preferences
+                <textarea
+                  value={preferences}
+                  onChange={(event) => setPreferences(event.target.value)}
+                  rows={3}
+                  placeholder="Any preferences for your stay?"
+                  className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-2.5"
+                />
+              </label>
             </section>
           </div>
 
-          <aside className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <aside className="h-max rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="mb-5 flex items-center gap-3">
               <div className="h-20 w-20 overflow-hidden rounded-xl bg-shade">
-                <img
-                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80"
-                  alt="Hotel"
-                  className="h-full w-full object-cover"
-                />
+                {booking.property?.image && (
+                  <img
+                    src={booking.property.image}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-stone-900">Namche Ridge Lodge</h3>
-                <p className="text-sm text-stone-600">Namche Bazaar · East-Facing Dawn</p>
-                <div className="mt-1 flex items-center gap-1 text-amber-500">
-                  <i className="fa-solid fa-star text-xs"></i>
-                  <i className="fa-solid fa-star text-xs"></i>
-                  <i className="fa-solid fa-star text-xs"></i>
-                  <i className="fa-solid fa-star text-xs"></i>
-                  <span className="ml-1 text-xs font-medium text-gray-700">4.8</span>
-                </div>
+                <h2 className="text-lg font-semibold text-stone-900">
+                  {booking.property?.propertyName || booking.property?.title}
+                </h2>
+                <p className="text-sm text-stone-600">
+                  {booking.property?.location?.town} ·{" "}
+                  {booking.property?.location?.region}
+                </p>
+                <p className="mt-1 text-sm text-amber-600">
+                  ★ {booking.property?.rating || 0}
+                </p>
               </div>
             </div>
-
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Check-in</span>
-                <span className="font-semibold text-gray-900">{checkIn}</span>
+            <dl className="space-y-2 rounded-xl bg-gray-50 p-4 text-sm">
+              <div className="flex justify-between gap-2">
+                <dt>Check-in</dt>
+                <dd className="font-semibold">{booking.checkIn}</dd>
               </div>
-              <div className="mt-2 flex justify-between text-sm text-gray-600">
-                <span>Check-out</span>
-                <span className="font-semibold text-gray-900">{checkOut}</span>
+              <div className="flex justify-between gap-2">
+                <dt>Check-out</dt>
+                <dd className="font-semibold">{booking.checkOut}</dd>
               </div>
-              <div className="mt-2 flex justify-between text-sm text-gray-600">
-                <span>Guests</span>
-                <span className="font-semibold text-gray-900">{guests} guests</span>
+              <div className="flex justify-between gap-2">
+                <dt>Room</dt>
+                <dd className="font-semibold">
+                  {booking.roomName} · {booking.rooms}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt>Guests</dt>
+                <dd className="font-semibold">
+                  {booking.adults} adults, {booking.children} children
+                </dd>
+              </div>
+            </dl>
+            <div className="mt-6 space-y-3 border-t border-gray-200 pt-5 text-sm">
+              <div className="flex justify-between">
+                <span>Room subtotal</span>
+                <span>{money(quote.roomSubtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Add-ons</span>
+                <span>{money(quote.addOnSubtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Taxes</span>
+                <span>{money(quote.taxes)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Fees</span>
+                <span>{money(quote.fees)}</span>
+              </div>
+              <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-bold">
+                <span>Total · {quote.nights} nights</span>
+                <span>{money(quote.total)}</span>
               </div>
             </div>
-
-            <div className="mt-6 space-y-4 border-t border-gray-200 pt-5">
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>{roomName} · {rooms} {rooms === "1" ? "room" : "rooms"}</span>
-                <span className="font-medium text-gray-900">NPR 12,500</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Taxes & fees</span>
-                <span className="font-medium text-gray-900">NPR 2,215</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Service fee</span>
-                <span className="font-medium text-gray-900">NPR 1,050</span>
-              </div>
-              <div className="flex justify-between border-t border-gray-200 pt-4 text-base font-bold text-gray-900">
-                <span>Total</span>
-                <span>NPR 15,765</span>
-              </div>
-            </div>
-
-            <Link
-              to="/payment"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-emerald px-4 py-3 text-base font-semibold text-white transition hover:bg-emerald/90"
+            {createBooking.error && (
+              <p role="alert" className="mt-4 text-sm text-red-600">
+                {createBooking.error.message}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={createBooking.isPending || !quote.available}
+              className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-emerald px-4 py-3 font-semibold text-white hover:bg-emerald/90 disabled:opacity-60"
             >
-              Continue to payment
-            </Link>
-
+              {createBooking.isPending
+                ? "Creating booking…"
+                : "Confirm booking"}
+            </button>
+            {!quote.available && (
+              <p className="mt-2 text-sm text-red-600">
+                These dates are no longer available.
+              </p>
+            )}
             <Link
-              to="/property-description"
-              className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-gray-300 px-4 py-3 text-base font-medium text-gray-700 transition hover:border-emerald hover:text-emerald"
+              to="/properties"
+              className="mt-3 inline-flex w-full justify-center text-sm text-stone-600 underline"
             >
-              Back to room selection
+              Back to stays
             </Link>
           </aside>
-        </div>
+        </form>
       </div>
     </Layout>
   );

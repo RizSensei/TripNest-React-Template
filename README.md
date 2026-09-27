@@ -13,7 +13,7 @@ The interface is designed to showcase:
 - dramatic mountain and sunrise visuals
 - region-based travel inspiration across Nepal
 - authentic local stay experiences
-- mock reservation and booking interactions
+- authenticated booking, wishlist, review, and profile interactions
 - a more emotional, immersive alternative to standard hotel search UX
 
 ## Key Features
@@ -52,7 +52,7 @@ The frontend includes:
 - payment page
 - confirmation page
 
-This supports the concept of a complete but frontend-only journey from discovery to booking.
+Property availability and booking details are supplied by the TripNest API. The payment provider is not configured, so the interface does not collect card details or claim that a booking has been paid.
 
 ### 5. Account & Trip Management
 The app also includes supporting front-end screens for:
@@ -79,6 +79,7 @@ The current dataset has been reduced to a cleaner demo set and includes a balanc
 - 2 resorts
 
 This is stored in [public/mock/properties.tsx](public/mock/properties.tsx).
+The legacy fixture remains available as a reference; property discovery and details use the configured API.
 
 ## Tech Stack
 
@@ -87,6 +88,7 @@ This is stored in [public/mock/properties.tsx](public/mock/properties.tsx).
 - React Router DOM
 - Tailwind CSS
 - DaisyUI
+- TanStack Query
 - Swiper
 - Leaflet / React-Leaflet
 
@@ -99,7 +101,9 @@ This is stored in [public/mock/properties.tsx](public/mock/properties.tsx).
 
 ## Notes
 
-This project remains a frontend-only prototype. It does not include a backend, live authentication, or real payment processing. The goal is to showcase the visual and UX concept of booking a memorable sunrise experience in Nepal.
+The frontend expects the TripNest API described in [FRONTEND_IMPLEMENTATION.md](./FRONTEND_IMPLEMENTATION.md). Configure `VITE_API_URL` with the backend origin (for example, `http://localhost:3001`); the client appends `/api/v1`. If it is omitted, the local development API URL is used. Auth tokens are kept in session storage and attached to protected API requests.
+
+Payment processing is not yet available in the backend. Booking creation, payment status retrieval, and payment setup requests are connected, but successful payment is not simulated.
 
 ## Run Locally
 

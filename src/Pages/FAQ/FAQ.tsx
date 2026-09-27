@@ -34,15 +34,26 @@ const FAQ = () => {
     <Layout>
       <div className="mx-auto max-w-5xl py-8 md:py-12">
         <div className="mb-8 text-center">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-orange-600">A little clarity before dawn</p>
-          <h1 className="mt-2 text-3xl font-bold text-stone-900">Questions about the view</h1>
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-orange-600">
+            A little clarity before dawn
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-stone-900">
+            Questions about the view
+          </h1>
         </div>
 
         <div className="space-y-4">
           {faqs.map((item) => (
-            <div key={item.question} className="rounded-2xl border border-orange-100 bg-white p-5 shadow-sm shadow-orange-100">
-              <h2 className="text-lg font-semibold text-stone-900">{item.question}</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-600">{item.answer}</p>
+            <div
+              key={item.question}
+              className="rounded-2xl border border-orange-100 bg-white p-5 shadow-sm shadow-orange-100"
+            >
+              <h2 className="text-lg font-semibold text-stone-900">
+                {item.question}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-stone-600">
+                {item.answer}
+              </p>
             </div>
           ))}
         </div>
