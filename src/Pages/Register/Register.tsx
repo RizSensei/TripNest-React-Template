@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useRegister } from "../../api/queries";
+import AuthLayout from "../../component/Auth/AuthLayout";
 
 const Register = () => {
   const register = useRegister();
@@ -34,85 +35,99 @@ const Register = () => {
   };
 
   return (
-    <div className="grid min-h-screen place-items-center px-5">
-      <div className="flex w-full max-w-sm flex-col gap-5">
-        <h1 className="text-center font-dynapuff text-5xl">
-          <span className="text-emerald">T</span>rip
-          <span className="text-emerald">N</span>est
-        </h1>
-        <form className="space-y-5" onSubmit={submit}>
-          <label className="block text-sm font-medium text-gray-900">
-            Name <span className="font-normal text-gray-500">(optional)</span>
+    <AuthLayout
+      eyebrow="Make room for wonder"
+      title="Meet the mornings you’ll talk about."
+      description="Create your account and start collecting stays with a view worth waking up for."
+      footer={
+        <p className="text-center text-sm text-stone-500">
+          Already have an account?{" "}
+          <Link to="/login" state={location.state} className="font-semibold text-orange-700 transition hover:text-orange-500">
+            Sign in
+          </Link>
+        </p>
+      }
+    >
+      <form className="space-y-4" onSubmit={submit}>
+        <label className="block text-sm font-semibold text-stone-700">
+          Your name <span className="font-normal text-stone-400">· optional</span>
+          <span className="relative mt-2 block">
+            <i className="fa-regular fa-user pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" aria-hidden="true" />
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
               autoComplete="name"
-              className="mt-2 block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-emerald"
+              placeholder="How should we address you?"
+              className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3 pl-11 pr-4 text-sm font-normal text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
             />
-          </label>
-          <label className="block text-sm font-medium text-gray-900">
-            Email address
+          </span>
+        </label>
+        <label className="block text-sm font-semibold text-stone-700">
+          Email address
+          <span className="relative mt-2 block">
+            <i className="fa-regular fa-envelope pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" aria-hidden="true" />
             <input
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
+              placeholder="you@example.com"
               required
-              className="mt-2 block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-emerald"
+              className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3 pl-11 pr-4 text-sm font-normal text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
             />
-          </label>
-          <label className="block text-sm font-medium text-gray-900">
-            Password
+          </span>
+        </label>
+        <label className="block text-sm font-semibold text-stone-700">
+          Password
+          <span className="relative mt-2 block">
+            <i className="fa-solid fa-lock pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" aria-hidden="true" />
             <input
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="new-password"
               minLength={8}
+              placeholder="At least 8 characters"
               required
-              className="mt-2 block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-emerald"
+              className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3 pl-11 pr-4 text-sm font-normal text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
             />
-          </label>
-          <label className="block text-sm font-medium text-gray-900">
-            Confirm password
+          </span>
+        </label>
+        <label className="block text-sm font-semibold text-stone-700">
+          Confirm password
+          <span className="relative mt-2 block">
+            <i className="fa-solid fa-shield-halved pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" aria-hidden="true" />
             <input
               type="password"
               value={confirmation}
               onChange={(event) => setConfirmation(event.target.value)}
               autoComplete="new-password"
               minLength={8}
+              placeholder="Enter your password again"
               required
-              className="mt-2 block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-emerald"
+              className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3 pl-11 pr-4 text-sm font-normal text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
             />
-          </label>
-          {errorMessage && (
-            <p role="alert" className="text-sm text-red-600">
-              {errorMessage}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={register.isPending}
-            className="flex w-full justify-center rounded-md bg-emerald px-3 py-2 text-sm font-semibold text-white hover:bg-emerald/90 disabled:opacity-60"
-          >
-            {register.isPending ? "Creating account…" : "Register"}
-          </button>
-        </form>
-        <p className="text-center text-sm text-gray-500">
-          Already registered?{" "}
-          <Link
-            to="/login"
-            state={location.state}
-            className="font-semibold text-emerald"
-          >
-            Sign in
-          </Link>
+          </span>
+        </label>
+        {errorMessage && (
+          <p role="alert" className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <i className="fa-solid fa-circle-exclamation mr-2" aria-hidden="true" />
+            {errorMessage}
+          </p>
+        )}
+        <button
+          type="submit"
+          disabled={register.isPending}
+          className="group flex w-full items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-stone-900/10 transition hover:-translate-y-0.5 hover:bg-orange-700 disabled:cursor-wait disabled:opacity-60"
+        >
+          {register.isPending ? "Creating your account…" : "Create account"}
+          {!register.isPending && <i className="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-1" aria-hidden="true" />}
+        </button>
+        <p className="text-center text-xs leading-5 text-stone-400">
+          By joining, you agree to TripNest’s terms and privacy statement.
         </p>
-        <Link to="/" className="text-center text-xs text-gray-400 underline">
-          Back to home
-        </Link>
-      </div>
-    </div>
+      </form>
+    </AuthLayout>
   );
 };
 
