@@ -100,8 +100,8 @@ const Trip_History = () => {
                       {property.location?.town}, {property.location?.region}
                     </p>
                     <p className="mt-1 text-sm text-stone-500">
-                      {new Date(trip.checkIn).toLocaleDateString()} –{" "}
-                      {new Date(trip.checkOut).toLocaleDateString()}
+                      {trip.checkInFormatted} –{" "}
+                      {trip.checkOutFormatted}
                     </p>
                     {property.slug && (
                       <Link

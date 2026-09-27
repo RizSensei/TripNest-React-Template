@@ -178,6 +178,8 @@ const Property_Description = () => {
     );
   }
 
+  const roomHighlights = property.roomHighlights ?? [];
+  const amenities = property.amenities ?? [];
   const photo =
     selectedView?.imageUrl || property.image || property.images?.[0]?.url;
 
@@ -324,13 +326,13 @@ const Property_Description = () => {
                 )}
               </section>
             )}
-            {property.roomHighlights?.length > 0 && (
+            {roomHighlights.length > 0 && (
               <section>
                 <h2 className="text-2xl font-bold text-stone-900">
                   Room highlights
                 </h2>
                 <ul className="mt-3 flex flex-wrap gap-2">
-                  {property.roomHighlights.map((item: string) => (
+                  {roomHighlights.map((item) => (
                     <li
                       key={item}
                       className="rounded-full bg-orange-100 px-3 py-2 text-sm text-orange-800"
@@ -341,11 +343,11 @@ const Property_Description = () => {
                 </ul>
               </section>
             )}
-            {property.amenities?.length > 0 && (
+            {amenities.length > 0 && (
               <section>
                 <h2 className="text-2xl font-bold text-stone-900">Amenities</h2>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {property.amenities.map((item: string) => (
+                  {amenities.map((item) => (
                     <li key={item} className="text-sm text-stone-700">
                       <i className="fa-solid fa-check mr-2 text-emerald" />
                       {item}

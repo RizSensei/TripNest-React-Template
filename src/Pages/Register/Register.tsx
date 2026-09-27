@@ -12,6 +12,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [validationError, setValidationError] = useState("");
+  const errorMessage = validationError || register.error?.message;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -84,9 +85,9 @@ const Register = () => {
               className="mt-2 block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-emerald"
             />
           </label>
-          {(validationError || register.error) && (
+          {errorMessage && (
             <p role="alert" className="text-sm text-red-600">
-              {validationError || register.error.message}
+              {errorMessage}
             </p>
           )}
           <button

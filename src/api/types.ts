@@ -61,8 +61,8 @@ export interface BookingSummary {
   status: string;
   paymentStatus?: string;
   property: PropertySummary;
-  checkIn: string;
-  checkOut: string;
+  checkInFormatted: string;
+  checkOutFormatted: string;
   room?: string;
   total: number;
   currency: string;

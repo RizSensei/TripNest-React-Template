@@ -158,7 +158,10 @@ export function useUpdateProfile() {
 export function useWishlistMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ propertyId, saved }) =>
+    mutationFn: /**
+      * @param {{ propertyId: string, saved: boolean }} variables
+      */
+    ({ propertyId, saved }) =>
       saved ? api.addWishlistItem(propertyId) : api.removeWishlistItem(propertyId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.wishlist }),
   });
@@ -191,7 +194,10 @@ export function useCreatePaymentIntent() {
 export function useCreateReview() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ propertyId, ...payload }) => api.createReview(propertyId, payload),
+    mutationFn: /**
+      * @param {{ propertyId: string, rating: number, title: string, body: string, bookingId: string }} variables
+      */
+    ({ propertyId, ...payload }) => api.createReview(propertyId, payload),
     onSuccess: (_review, { propertyId }) =>
       queryClient.invalidateQueries({ queryKey: ["reviews", propertyId] }),
   });

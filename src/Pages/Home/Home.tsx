@@ -2,6 +2,7 @@ import Layout from "../../component/Layout/Layout";
 import { Link } from "react-router-dom";
 import Newsletter from "../../component/Newsletter/Newsletter";
 import { useProperties } from "../../api/queries";
+import type { PropertySummary } from "../../api/types";
 
 const Home = () => {
   const propertiesQuery = useProperties({
@@ -9,7 +10,7 @@ const Home = () => {
     pageSize: 5,
     sort: "recommended",
   });
-  const featuredProperties = propertiesQuery.data?.items || [];
+  const featuredProperties = (propertiesQuery.data?.items || []) as PropertySummary[];
 
   return (
     <Layout>

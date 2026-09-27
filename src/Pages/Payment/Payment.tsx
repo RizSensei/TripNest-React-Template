@@ -10,6 +10,7 @@ const Payment = () => {
   const paymentStatus = usePaymentStatus(bookingId);
   const createPaymentIntent = useCreatePaymentIntent();
   const [requestError, setRequestError] = useState("");
+  const paymentError = requestError || createPaymentIntent.error?.message;
 
   const startPayment = async () => {
     setRequestError("");
@@ -79,9 +80,9 @@ const Payment = () => {
                 ? "Checking payment setup…"
                 : "Check payment setup"}
             </button>
-            {(requestError || createPaymentIntent.error) && (
+            {paymentError && (
               <p role="alert" className="mt-3 text-sm text-red-700">
-                {requestError || createPaymentIntent.error.message}
+                {paymentError}
               </p>
             )}
           </section>

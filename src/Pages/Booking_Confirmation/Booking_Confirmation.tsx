@@ -56,7 +56,7 @@ const Booking_Confirmation = () => {
                     Check-in
                   </p>
                   <p className="mt-2 text-lg font-semibold text-gray-900">
-                    {new Date(booking.dates?.checkIn).toLocaleDateString()}
+                    {booking.dates?.checkInFormatted}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-gray-50 p-4">
