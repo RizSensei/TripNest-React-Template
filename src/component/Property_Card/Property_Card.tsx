@@ -46,10 +46,15 @@ const Property_Card = ({ property, saved = false }: PropertyCardProps) => {
           type="button"
           onClick={toggleSaved}
           aria-label={isSaved ? "Remove from wishlist" : "Add to wishlist"}
+          aria-busy={wishlist.isPending}
           disabled={wishlist.isPending}
           className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white text-red-500 shadow"
         >
-          <i className={`fa-${isSaved ? "solid" : "regular"} fa-heart`} />
+          {wishlist.isPending ? (
+            <i className="fa-solid fa-spinner animate-spin text-orange-600" aria-hidden="true" />
+          ) : (
+            <i className={`fa-${isSaved ? "solid" : "regular"} fa-heart`} aria-hidden="true" />
+          )}
         </button>
         <div className="flex flex-col gap-2 px-2 font-medium">
           <div>
