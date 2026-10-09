@@ -117,6 +117,18 @@ export function useLogin() {
   });
 }
 
+export function useGoogleAuth() {
+  const { setSession } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: api.googleLogin,
+    onSuccess: ({ token, user }) => {
+      setSession(token);
+      queryClient.setQueryData(queryKeys.currentUser, user);
+    },
+  });
+}
+
 export function useRegister() {
   const { setSession } = useAuth();
   const queryClient = useQueryClient();

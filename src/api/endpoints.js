@@ -27,6 +27,12 @@ export const api = {
     apiRequest("/auth/register", { method: "POST", body: payload, skipAuth: true }),
   login: (payload) =>
     apiRequest("/auth/login", { method: "POST", body: payload, skipAuth: true }),
+  googleLogin: (credential) =>
+    apiRequest("/auth/google", {
+      method: "POST",
+      body: { credential },
+      skipAuth: true,
+    }),
   logout: () => apiRequest("/auth/logout", { method: "POST" }),
   currentUser: () => apiRequest("/auth/me"),
   profile: () => apiRequest("/me"),

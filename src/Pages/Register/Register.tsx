@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useRegister } from "../../api/queries";
+import { useGoogleAuth, useRegister } from "../../api/queries";
 import AuthLayout from "../../component/Auth/AuthLayout";
+import GoogleAuthButton from "../../component/Auth/GoogleAuthButton";
 
 const Register = () => {
   const register = useRegister();
+  const googleAuth = useGoogleAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [name, setName] = useState("");
@@ -13,7 +15,20 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [validationError, setValidationError] = useState("");
-  const errorMessage = validationError || register.error?.message;
+  const [googleError, setGoogleError] = useState("");
+  const errorMessage =
+    validationError ||
+    googleError ||
+    googleAuth.error?.message ||
+    register.error?.message;
+
+  const finishRegistration = () => {
+    const destination = location.state?.from;
+    navigate(
+      `${destination?.pathname || "/"}${destination?.search || ""}${destination?.hash || ""}`,
+      { replace: true, state: destination?.state },
+    );
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -24,11 +39,17 @@ const Register = () => {
     setValidationError("");
     try {
       await register.mutateAsync({ name: name || undefined, email, password });
-      const destination = location.state?.from;
-      navigate(
-        `${destination?.pathname || "/"}${destination?.search || ""}${destination?.hash || ""}`,
-        { replace: true, state: destination?.state },
-      );
+      finishRegistration();
+    } catch {
+      // The mutation error is rendered below.
+    }
+  };
+
+  const registerWithGoogle = async (credential: string) => {
+    setGoogleError("");
+    try {
+      await googleAuth.mutateAsync(credential);
+      finishRegistration();
     } catch {
       // The mutation error is rendered below.
     }
@@ -48,6 +69,18 @@ const Register = () => {
         </p>
       }
     >
+      <div className="mb-5 space-y-4">
+        <GoogleAuthButton
+          onCredential={registerWithGoogle}
+          onError={setGoogleError}
+          text="signup_with"
+        />
+        <div className="flex items-center gap-3 text-xs text-stone-400">
+          <span className="h-px flex-1 bg-stone-200" />
+          or sign up with email
+          <span className="h-px flex-1 bg-stone-200" />
+        </div>
+      </div>
       <form className="space-y-4" onSubmit={submit}>
         <label className="block text-sm font-semibold text-stone-700">
           Your name <span className="font-normal text-stone-400">· optional</span>

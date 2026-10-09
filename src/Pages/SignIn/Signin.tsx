@@ -1,25 +1,42 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useLogin } from "../../api/queries";
+import { useGoogleAuth, useLogin } from "../../api/queries";
 import AuthLayout from "../../component/Auth/AuthLayout";
+import GoogleAuthButton from "../../component/Auth/GoogleAuthButton";
 
 const Signin = () => {
   const login = useLogin();
+  const googleAuth = useGoogleAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [googleError, setGoogleError] = useState("");
+
+  const finishSignIn = () => {
+    const destination = location.state?.from;
+    navigate(
+      `${destination?.pathname || "/"}${destination?.search || ""}${destination?.hash || ""}`,
+      { replace: true, state: destination?.state },
+    );
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       await login.mutateAsync({ email, password });
-      const destination = location.state?.from;
-      navigate(
-        `${destination?.pathname || "/"}${destination?.search || ""}${destination?.hash || ""}`,
-        { replace: true, state: destination?.state },
-      );
+      finishSignIn();
+    } catch {
+      // The mutation error is rendered below.
+    }
+  };
+
+  const signInWithGoogle = async (credential: string) => {
+    setGoogleError("");
+    try {
+      await googleAuth.mutateAsync(credential);
+      finishSignIn();
     } catch {
       // The mutation error is rendered below.
     }
@@ -39,6 +56,18 @@ const Signin = () => {
         </p>
       }
     >
+      <div className="mb-5 space-y-4">
+        <GoogleAuthButton
+          onCredential={signInWithGoogle}
+          onError={setGoogleError}
+          text="signin_with"
+        />
+        <div className="flex items-center gap-3 text-xs text-stone-400">
+          <span className="h-px flex-1 bg-stone-200" />
+          or sign in with email
+          <span className="h-px flex-1 bg-stone-200" />
+        </div>
+      </div>
       <form className="space-y-5" onSubmit={submit}>
         <label className="block text-sm font-semibold text-stone-700">
           Email address
@@ -70,10 +99,10 @@ const Signin = () => {
             />
           </span>
         </label>
-        {login.error && (
+        {(googleError || googleAuth.error?.message || login.error?.message) && (
           <p role="alert" className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
             <i className="fa-solid fa-circle-exclamation mr-2" aria-hidden="true" />
-            {login.error.message}
+            {googleError || googleAuth.error?.message || login.error?.message}
           </p>
         )}
         <button

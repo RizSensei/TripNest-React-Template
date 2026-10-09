@@ -30,6 +30,7 @@ Frontend-facing API contract for the TripNest application. Examples reflect the 
 | Get payment status | `GET /bookings/{bookingId}/payment` | Bearer token |
 | Register | `POST /auth/register` | No |
 | Log in | `POST /auth/login` | No |
+| Sign in or register with Google | `POST /auth/google` | No |
 | Log out | `POST /auth/logout` | Bearer token |
 | Get current user | `GET /auth/me` | Bearer token |
 | Get profile | `GET /me` | Bearer token |
@@ -576,6 +577,18 @@ Example response (`201`):
 ```
 
 Example response (`200`): same `{ "user": { ... }, "token": "..." }` shape as registration. Invalid credentials return `401`.
+
+### `POST /auth/google`
+
+The sign-in and registration pages use Google's Identity Services to obtain an ID token and send it to the API. The API verifies the token and returns the same session shape as password authentication.
+
+```json
+{
+  "credential": "google-id-token"
+}
+```
+
+The API creates a new Google-backed user (`201`) or signs in an existing Google identity (`200`). An existing password account with the same email is not automatically linked and returns `409`; the user should sign in with that password account instead.
 
 ### `POST /auth/logout`
 
