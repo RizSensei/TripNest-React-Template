@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import Layout from "../../component/Layout/Layout";
 import Property_Card from "../../component/Property_Card/Property_Card";
@@ -6,25 +6,39 @@ import { useProperties, usePropertyFilters } from "../../api/queries";
 import type { PropertySummary } from "../../api/types";
 
 const PAGE_SIZE = 20;
+const PRICE_FILTER_DEBOUNCE_MS = 400;
 
 const All_Properties = () => {
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [minimumRating, setMinimumRating] = useState(0);
   const [maximumPrice, setMaximumPrice] = useState(1000);
+  const [appliedMaximumPrice, setAppliedMaximumPrice] = useState(1000);
   const [sortBy, setSortBy] = useState("recommended");
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    if (maximumPrice === appliedMaximumPrice) return;
+
+    const timeout = window.setTimeout(() => {
+      setAppliedMaximumPrice(maximumPrice);
+      setPage(1);
+    }, PRICE_FILTER_DEBOUNCE_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [appliedMaximumPrice, maximumPrice]);
+
   const filters = useMemo(
     () => ({
       vibe: selectedVibes,
       region: selectedRegions,
       minRating: minimumRating || undefined,
-      maxPrice: maximumPrice < 1000 ? maximumPrice : undefined,
+      maxPrice: appliedMaximumPrice < 1000 ? appliedMaximumPrice : undefined,
       sort: sortBy,
       page,
       pageSize: PAGE_SIZE,
     }),
-    [maximumPrice, minimumRating, page, selectedRegions, selectedVibes, sortBy],
+    [appliedMaximumPrice, minimumRating, page, selectedRegions, selectedVibes, sortBy],
   );
   const propertiesQuery = useProperties(filters);
   const filtersQuery = usePropertyFilters();
@@ -58,6 +72,7 @@ const All_Properties = () => {
     setSelectedRegions([]);
     setMinimumRating(0);
     setMaximumPrice(1000);
+    setAppliedMaximumPrice(1000);
     setSortBy("recommended");
     setPage(1);
   };
@@ -146,7 +161,6 @@ const All_Properties = () => {
                       Math.max(0, Number(event.target.value) || 0),
                     ),
                   );
-                  setPage(1);
                 }}
                 min="0"
                 max="1000"
@@ -159,7 +173,6 @@ const All_Properties = () => {
                 value={maximumPrice}
                 onChange={(event) => {
                   setMaximumPrice(Number(event.target.value));
-                  setPage(1);
                 }}
                 className="range range-xs mt-2"
                 step="25"
